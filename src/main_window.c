@@ -8,6 +8,12 @@ static Time s_last_time, s_anim_time;
 static char s_weekday_buffer[8], s_month_buffer[8], s_day_in_month_buffer[3];
 static bool s_animating, s_connected;
 
+static GColor colorForeGround, colorBackGround;
+
+#ifdef PBL_COLOR
+static GColor8 colorLight, colorHeavy, colorGreen, colorSecondHand, colorAccent;
+#endif
+
 static void tick_handler(struct tm *tick_time, TimeUnits changed) {
   s_last_time.days = tick_time->tm_mday;
   s_last_time.hours = tick_time->tm_hour;
@@ -94,21 +100,21 @@ static void bg_update_proc(Layer *layer, GContext *ctx) {
 #ifdef PBL_COLOR
             if(plugged) {
               // Charging
-              graphics_context_set_stroke_color(ctx, GColorGreen);
+              graphics_context_set_stroke_color(ctx, colorGreen);
             } else {
               // Discharging at this level
-              graphics_context_set_stroke_color(ctx, GColorWhite);
+              graphics_context_set_stroke_color(ctx, colorForeGround);
             }
 #else
-            graphics_context_set_stroke_color(ctx, GColorWhite);
+            graphics_context_set_stroke_color(ctx, colorForeGround);
 #endif
           } else {
             // Empty segment
-            graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkGray, GColorBlack));
+            graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(colorLight, colorBackGround));
           }
         } else {
           // No battery indicator, show all
-          graphics_context_set_stroke_color(ctx, GColorWhite);
+          graphics_context_set_stroke_color(ctx, colorForeGround);
         }
         graphics_draw_line(ctx, GPoint(center.x + x, center.y + y), GPoint(point.x + x, point.y + y));
       }
@@ -116,7 +122,7 @@ static void bg_update_proc(Layer *layer, GContext *ctx) {
   }
 
   // Make markers
-  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_context_set_fill_color(ctx, colorBackGround);
 #ifdef PBL_ROUND
   graphics_fill_circle(ctx, center, (bounds.size.w / 2) - (2 * MARGIN));
 #else
@@ -186,14 +192,14 @@ static void draw_proc(Layer *layer, GContext *ctx) {
   };
 
   // Draw hands
-  graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorLightGray, GColorWhite));
+  graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(colorHeavy, colorForeGround));
   for(int y = 0; y < THICKNESS; y++) {
     for(int x = 0; x < THICKNESS; x++) {
       graphics_draw_line(ctx, GPoint(center.x + x, center.y + y), GPoint(minute_hand_short.x + x, minute_hand_short.y + y));
       graphics_draw_line(ctx, GPoint(center.x + x, center.y + y), GPoint(hour_hand_short.x + x, hour_hand_short.y + y));
     }
   }
-  graphics_context_set_stroke_color(ctx, GColorWhite);
+  graphics_context_set_stroke_color(ctx, colorForeGround);
   for(int y = 0; y < THICKNESS; y++) {
     for(int x = 0; x < THICKNESS; x++) {
       graphics_draw_line(ctx, GPoint(minute_hand_short.x + x, minute_hand_short.y + y), GPoint(minute_hand_long.x + x, minute_hand_long.y + y));
@@ -206,23 +212,23 @@ static void draw_proc(Layer *layer, GContext *ctx) {
     // Use loops
     for(int y = 0; y < THICKNESS - 1; y++) {
       for(int x = 0; x < THICKNESS - 1; x++) {
-        graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorWhite));
+        graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(colorSecondHand, colorForeGround));
         graphics_draw_line(ctx, GPoint(center.x + x, center.y + y), GPoint(second_hand_short.x + x, second_hand_short.y + y));
 
         // Draw second hand tip
-        graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorChromeYellow, GColorWhite));
+        graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(colorAccent, colorForeGround));
         graphics_draw_line(ctx, GPoint(second_hand_short.x + x, second_hand_short.y + y), GPoint(second_hand_long.x + x, second_hand_long.y + y));
       }
     }
   }
 
   // Center
-  graphics_context_set_fill_color(ctx, GColorWhite);
+  graphics_context_set_fill_color(ctx, colorForeGround);
   graphics_fill_circle(ctx, GPoint(center.x + 1, center.y + 1), 4);
 
   // Draw black if disconnected
   if(config_get(PERSIST_KEY_BT) && !s_connected) {
-    graphics_context_set_fill_color(ctx, GColorBlack);
+    graphics_context_set_fill_color(ctx, colorBackGround);
     graphics_fill_circle(ctx, GPoint(center.x + 1, center.y + 1), 3);
   }
 }
@@ -254,19 +260,19 @@ static void window_load(Window *window) {
   s_weekday_layer = text_layer_create(GRect(x, 55, 44, 40));
   text_layer_set_text_alignment(s_weekday_layer, GTextAlignmentCenter);
   text_layer_set_font(s_weekday_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
-  text_layer_set_text_color(s_weekday_layer, GColorWhite);
+  text_layer_set_text_color(s_weekday_layer, colorForeGround);
   text_layer_set_background_color(s_weekday_layer, GColorClear);
 
   s_day_in_month_layer = text_layer_create(GRect(x, 68, 44, 40));
   text_layer_set_text_alignment(s_day_in_month_layer, GTextAlignmentCenter);
   text_layer_set_font(s_day_in_month_layer, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
-  text_layer_set_text_color(s_day_in_month_layer, PBL_IF_COLOR_ELSE(GColorChromeYellow, GColorWhite));
+  text_layer_set_text_color(s_day_in_month_layer, PBL_IF_COLOR_ELSE(colorAccent, colorForeGround));
   text_layer_set_background_color(s_day_in_month_layer, GColorClear);
 
   s_month_layer = text_layer_create(GRect(x, 95, 44, 40));
   text_layer_set_text_alignment(s_month_layer, GTextAlignmentCenter);
   text_layer_set_font(s_month_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
-  text_layer_set_text_color(s_month_layer, GColorWhite);
+  text_layer_set_text_color(s_month_layer, colorForeGround);
   text_layer_set_background_color(s_month_layer, GColorClear);
 
   if(config_get(PERSIST_KEY_DAY)) {
@@ -309,8 +315,33 @@ static void hands_update(Animation *anim, AnimationProgress dist_normalized) {
 }
 
 void main_window_push() {
+  
+    if (config_get(PERSIST_KEY_LIGHT_THEME)) {
+    colorForeGround = GColorBlack;
+    colorBackGround = GColorWhite;
+#ifdef PBL_COLOR
+    colorLight = GColorDarkGray;
+    colorHeavy = GColorDarkGray;
+    colorGreen = GColorJaegerGreen;
+    colorSecondHand = GColorRed;
+    colorAccent = GColorDarkCandyAppleRed;
+#endif
+  }
+  else {
+    colorForeGround = GColorWhite;
+    colorBackGround = GColorBlack;
+#ifdef PBL_COLOR
+    colorLight = GColorDarkGray;
+    colorHeavy = GColorLightGray;
+    colorGreen = GColorGreen;
+    colorSecondHand = GColorDarkCandyAppleRed;
+    colorAccent = GColorChromeYellow;
+#endif
+  }
+  
+  
   s_main_window = window_create();
-  window_set_background_color(s_main_window, GColorBlack);
+  window_set_background_color(s_main_window, colorBackGround);
   window_set_window_handlers(s_main_window, (WindowHandlers) {
     .load = window_load,
     .unload = window_unload,

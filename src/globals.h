@@ -20,7 +20,8 @@
 #define PERSIST_KEY_BATTERY     3
 #define PERSIST_KEY_SECOND_HAND 4
 #define PERSIST_KEY_NO_MARKERS  5
-#define NUM_SETTINGS            6
+#define PERSIST_KEY_LIGHT_THEME 6
+#define NUM_SETTINGS            7
 
 typedef struct {
   int days;
