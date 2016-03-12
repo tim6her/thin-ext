@@ -12,6 +12,7 @@
         "configurable"
     ],
     "companyName": "Chris Lewis, Silas Graffy",
+    "enableMultiJS": false,
     "longName": "Thin Extended",
     "projectType": "native",
     "resources": {
