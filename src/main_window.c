@@ -19,8 +19,8 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
   s_last_time.hours = tick_time->tm_hour;
   s_last_time.minutes = tick_time->tm_min;
   s_last_time.seconds = tick_time->tm_sec;
-
-  s_last_time.hours -= (s_last_time.hours > 12) ? 12 : 0;
+  
+  //s_last_time.hours -= (s_last_time.hours > 12) ? 12 : 0;
 
   snprintf(s_day_in_month_buffer, sizeof(s_day_in_month_buffer), "%d", s_last_time.days);
   strftime(s_weekday_buffer, sizeof(s_weekday_buffer), "%a", tick_time);
@@ -208,7 +208,11 @@ static void draw_proc(Layer *layer, GContext *ctx) {
   }
 
   // Draw second hand
-  if(config_get(PERSIST_KEY_SECOND_HAND)) {
+  BatteryChargeState state = battery_state_service_peek();
+  if(config_get(PERSIST_KEY_SECOND_HAND)
+   && (!config_get(PERSIST_KEY_SECOND_BATTERY) || state.is_plugged || state.charge_percent >= 20.0F )
+   && (!config_get(PERSIST_KEY_SECOND_NIGHT) || (s_last_time.hours > 6 && s_last_time.hours < 23))
+    ) {
     // Use loops
     for(int y = 0; y < THICKNESS - 1; y++) {
       for(int x = 0; x < THICKNESS - 1; x++) {

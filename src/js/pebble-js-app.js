@@ -1,4 +1,4 @@
-var VERSION = "1.8";
+var VERSION = "1.9";
 
 Pebble.addEventListener('ready', function(e) {
   console.log('PebbleKit JS ready! Version: ' + VERSION);
@@ -17,6 +17,8 @@ Pebble.addEventListener('webviewclosed', function(e) {
     "PERSIST_KEY_BT": '' + json.bluetooth,
     "PERSIST_KEY_BATTERY": '' + json.battery,
     "PERSIST_KEY_SECOND_HAND": '' + json.second_hand,
+    "PERSIST_KEY_SECOND_BATTERY": '' + json.second_battery,
+    "PERSIST_KEY_SECOND_NIGHT": '' + json.second_night,
     "PERSIST_KEY_NO_MARKERS": '' + json.no_markers,
     "PERSIST_KEY_LIGHT_THEME": '' + json.light_theme
   };
