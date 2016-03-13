@@ -20,8 +20,6 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
   s_last_time.minutes = tick_time->tm_min;
   s_last_time.seconds = tick_time->tm_sec;
   
-  //s_last_time.hours -= (s_last_time.hours > 12) ? 12 : 0;
-
   snprintf(s_day_in_month_buffer, sizeof(s_day_in_month_buffer), "%d", s_last_time.days);
   strftime(s_weekday_buffer, sizeof(s_weekday_buffer), "%a", tick_time);
   strftime(s_month_buffer, sizeof(s_month_buffer), "%b", tick_time);
@@ -309,8 +307,6 @@ static int anim_percentage(AnimationProgress dist_normalized, int max) {
 }
 
 static void hands_update(Animation *anim, AnimationProgress dist_normalized) {
-  s_last_time.hours -= (s_last_time.hours > 12) ? 12 : 0;
-
   s_anim_time.hours = anim_percentage(dist_normalized, hours_to_minutes(s_last_time.hours));
   s_anim_time.minutes = anim_percentage(dist_normalized, s_last_time.minutes);
   s_anim_time.seconds = anim_percentage(dist_normalized, s_last_time.seconds);
