@@ -151,7 +151,7 @@
           // persistWrite('no_markers', options.no_markers);
 
           // Set the return URL depending on the runtime environment
-          var return_to = 'pebblejs://close#'; //getQueryParam('return_to', 'pebblejs://close#');
+          var return_to = getQueryParam('return_to', 'pebblejs://close#');
 		  document.location = return_to + encodeURIComponent(JSON.stringify(options));
         }, 
       false);
