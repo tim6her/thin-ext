@@ -92,7 +92,7 @@
       function getAppVersionAndNews() {
         //Get latest
         ajax(
-          'https://dl.dropboxusercontent.com/u/10824180/pebble%20config%20pages/app_versions.json', 
+          'https://cdn.rawgit.com/silasg/thin/round/config/app_versions.json', 
           'GET',
           function(responseText) {
             var json = JSON.parse(responseText);
