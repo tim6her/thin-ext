@@ -5,3 +5,12 @@ build
 .lock-waf_darwin_build
 releases
 assets
+*.pbxproj
+
+*.xcworkspacedata
+
+*.xcuserstate
+
+*.xcscheme
+
+*.plist
