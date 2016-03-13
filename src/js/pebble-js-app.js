@@ -5,7 +5,7 @@ Pebble.addEventListener('ready', function(e) {
 });
 
 Pebble.addEventListener('showConfiguration', function(e) {
-  Pebble.openURL('https://dl.dropboxusercontent.com/s/7xz5oxa2ot6mthk/thin-ext-config.html');//?version=' + VERSION);
+  Pebble.openURL('https://rawgit.com/silasg/thin/round/config/thin-ext-config.htmlversion=' + VERSION);
 });
 
 Pebble.addEventListener('webviewclosed', function(e) {
