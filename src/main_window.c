@@ -124,12 +124,10 @@ void draw_markers(Layer *layer, GContext *ctx) {
 
 static void update_background_layer(Layer *layer, GContext *ctx) {
     
-    if(config_get(PERSIST_KEY_NO_MARKERS)) {
-        // Don't draw anything here
+    if(config_get(PERSIST_KEY_NO_MARKERS))
         return;
-    }
-    
-    draw_markers(layer, ctx);
+    else
+        draw_markers(layer, ctx);
     
 }
 
@@ -144,31 +142,64 @@ static int hours_to_minutes(int hours_out_of_12) {
     return (int)(float)(((float)hours_out_of_12 / 12.0F) * 60.0F);
 }
 
-static void update_hands_layer(Layer *layer, GContext *ctx) {
-    GRect bounds = layer_get_bounds(layer);
-    GPoint center = grect_center_point(&bounds);
+void draw_center(GContext *ctx, GPoint center) {
+    // Center
+    graphics_context_set_fill_color(ctx, colorForeGround);
+    graphics_fill_circle(ctx, GPoint(center.x + 1, center.y + 1), 4);
     
-    Time mode_time = (s_animating) ? s_anim_time : s_last_time;
-    
+    // Draw black if disconnected
+    if(config_get(PERSIST_KEY_BT) && !s_connected) {
+        graphics_context_set_fill_color(ctx, colorBackGround);
+        graphics_fill_circle(ctx, GPoint(center.x + 1, center.y + 1), 3);
+    }
+}
+
+void draw_second_hand(GPoint center, Time mode_time, GContext *ctx) {
     int len_sec = HAND_LENGTH_SEC;
+   
+    // Longer when no markers?
+    if(config_get(PERSIST_KEY_NO_MARKERS))
+        len_sec += 20;
+    
+    // Draw second hand
+    GPoint second_hand_long = make_hand_point(mode_time.seconds, 60, len_sec, center);
+    len_sec -= (MARGIN + 2);
+    GPoint second_hand_short = make_hand_point(mode_time.seconds, 60, len_sec, center);
+    
+    BatteryChargeState state = battery_state_service_peek();
+    if(config_get(PERSIST_KEY_SECOND_HAND)
+       && (!config_get(PERSIST_KEY_SECOND_BATTERY) || state.is_plugged || state.charge_percent >= 20.0F )
+       && (!config_get(PERSIST_KEY_SECOND_NIGHT) || (s_last_time.hours > 6 && s_last_time.hours < 23))
+       ) {
+        // Use loops
+        for(int y = 0; y < THICKNESS - 1; y++) {
+            for(int x = 0; x < THICKNESS - 1; x++) {
+                graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(colorSecondHand, colorForeGround));
+                graphics_draw_line(ctx, GPoint(center.x + x, center.y + y), GPoint(second_hand_short.x + x, second_hand_short.y + y));
+                
+                // Draw second hand tip
+                graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(colorAccent, colorForeGround));
+                graphics_draw_line(ctx, GPoint(second_hand_short.x + x, second_hand_short.y + y), GPoint(second_hand_long.x + x, second_hand_long.y + y));
+            }
+        }
+    }
+}
+
+void draw_min_hour_hands(GPoint center, Time mode_time, GContext *ctx) {
     int len_min = HAND_LENGTH_MIN;
     int len_hour = HAND_LENGTH_HOUR;
     
     // Longer when no markers?
     if(config_get(PERSIST_KEY_NO_MARKERS)) {
-        len_sec += 20;
         len_min += 20;
         len_hour += 20;
     }
     
     // Plot hand ends
-    GPoint second_hand_long = make_hand_point(mode_time.seconds, 60, len_sec, center);
     GPoint minute_hand_long = make_hand_point(mode_time.minutes, 60, len_min, center);
     
     // Plot shorter overlaid hands
-    len_sec -= (MARGIN + 2);
     len_min -= (MARGIN + 2);
-    GPoint second_hand_short = make_hand_point(mode_time.seconds, 60, len_sec, center);
     GPoint minute_hand_short = make_hand_point(mode_time.minutes, 60, len_min, center);
     
     float minute_angle = TRIG_MAX_ANGLE * mode_time.minutes / 60;
@@ -209,35 +240,19 @@ static void update_hands_layer(Layer *layer, GContext *ctx) {
             graphics_draw_line(ctx, GPoint(hour_hand_short.x + x, hour_hand_short.y + y), GPoint(hour_hand_long.x + x, hour_hand_long.y + y));
         }
     }
+}
+
+static void update_hands_layer(Layer *layer, GContext *ctx) {
+    GRect bounds = layer_get_bounds(layer);
+    GPoint center = grect_center_point(&bounds);
     
-    // Draw second hand
-    BatteryChargeState state = battery_state_service_peek();
-    if(config_get(PERSIST_KEY_SECOND_HAND)
-       && (!config_get(PERSIST_KEY_SECOND_BATTERY) || state.is_plugged || state.charge_percent >= 20.0F )
-       && (!config_get(PERSIST_KEY_SECOND_NIGHT) || (s_last_time.hours > 6 && s_last_time.hours < 23))
-       ) {
-        // Use loops
-        for(int y = 0; y < THICKNESS - 1; y++) {
-            for(int x = 0; x < THICKNESS - 1; x++) {
-                graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(colorSecondHand, colorForeGround));
-                graphics_draw_line(ctx, GPoint(center.x + x, center.y + y), GPoint(second_hand_short.x + x, second_hand_short.y + y));
-                
-                // Draw second hand tip
-                graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(colorAccent, colorForeGround));
-                graphics_draw_line(ctx, GPoint(second_hand_short.x + x, second_hand_short.y + y), GPoint(second_hand_long.x + x, second_hand_long.y + y));
-            }
-        }
-    }
+    Time mode_time = (s_animating) ? s_anim_time : s_last_time;
     
-    // Center
-    graphics_context_set_fill_color(ctx, colorForeGround);
-    graphics_fill_circle(ctx, GPoint(center.x + 1, center.y + 1), 4);
+    draw_min_hour_hands(center, mode_time, ctx);
     
-    // Draw black if disconnected
-    if(config_get(PERSIST_KEY_BT) && !s_connected) {
-        graphics_context_set_fill_color(ctx, colorBackGround);
-        graphics_fill_circle(ctx, GPoint(center.x + 1, center.y + 1), 3);
-    }
+    draw_second_hand(center, mode_time, ctx);
+    
+    draw_center(ctx, center);
 }
 
 static void bt_handler(bool connected) {
