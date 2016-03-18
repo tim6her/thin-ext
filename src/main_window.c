@@ -14,11 +14,16 @@ static GColor colorForeGround, colorBackGround;
 static GColor8 colorLight, colorHeavy, colorGreen, colorSecondHand, colorAccent;
 #endif
 
-static void tick_handler(struct tm *tick_time, TimeUnits changed) {
+void set_last_time(struct tm *tick_time) {
     s_last_time.days = tick_time->tm_mday;
     s_last_time.hours = tick_time->tm_hour;
     s_last_time.minutes = tick_time->tm_min;
     s_last_time.seconds = tick_time->tm_sec;
+}
+
+static void tick_handler(struct tm *tick_time, TimeUnits changed) {
+    
+    set_last_time(tick_time);
     
     snprintf(s_day_in_month_buffer, sizeof(s_day_in_month_buffer), "%d", s_last_time.days);
     strftime(s_weekday_buffer, sizeof(s_weekday_buffer), "%a", tick_time);
