@@ -26,7 +26,7 @@ function loadOptions() {
 
 function getConfigData() {
     var options = {
-        light_theme: $(''[name='light_theme']'')[0].val === 'true'
+        light_theme: $('[name="light_theme"]')[0].val === 'true'
     };
     
     
