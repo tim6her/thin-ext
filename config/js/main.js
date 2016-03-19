@@ -82,8 +82,8 @@ function getAppVersionAndNews() {
          'GET',
          function(responseText) {
          var json = JSON.parse(responseText);
-         $('#latest_version')[0].innerHTML = 'Latest version: ' + json.thin-ext;
-         $('#latest_news')[0].innerHTML = '' + json.thin-ext-news;
+         $('#latest_version')[0].innerHTML = 'Latest version: ' + json.thin_ext;
+         $('#latest_news')[0].innerHTML = '' + json.thin_ext_news;
          }
          );
     
