@@ -16,6 +16,7 @@ void config_init() {
     persist_write_bool(PERSIST_KEY_SECOND_BATTERY, true);
     persist_write_bool(PERSIST_KEY_SECOND_NIGHT, true);
     persist_write_bool(PERSIST_KEY_LIGHT_THEME, false);
+    persist_write_bool(PERSIST_KEY_NO_MARKERS, false);
   }
 
   for(int i = 0; i < NUM_SETTINGS; i++) {

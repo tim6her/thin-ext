@@ -160,22 +160,23 @@ void draw_center(GContext *ctx, GPoint center) {
 }
 
 void draw_second_hand(GPoint center, Time mode_time, GContext *ctx) {
-    int len_sec = HAND_LENGTH_SEC;
-   
-    // Longer when no markers?
-    if(config_get(PERSIST_KEY_NO_MARKERS))
-        len_sec += 20;
-    
-    // Draw second hand
-    GPoint second_hand_long = make_hand_point(mode_time.seconds, 60, len_sec, center);
-    len_sec -= (MARGIN + 2);
-    GPoint second_hand_short = make_hand_point(mode_time.seconds, 60, len_sec, center);
-    
     BatteryChargeState state = battery_state_service_peek();
     if(config_get(PERSIST_KEY_SECOND_HAND)
        && (!config_get(PERSIST_KEY_SECOND_BATTERY) || state.is_plugged || state.charge_percent >= 20.0F )
        && (!config_get(PERSIST_KEY_SECOND_NIGHT) || (s_last_time.hours > 6 && s_last_time.hours < 23))
        ) {
+        
+        int len_sec = HAND_LENGTH_SEC;
+        
+        // Longer when no markers?
+        if(config_get(PERSIST_KEY_NO_MARKERS))
+            len_sec += 20;
+        
+        // Draw second hand
+        GPoint second_hand_long = make_hand_point(mode_time.seconds, 60, len_sec, center);
+        len_sec -= (MARGIN + 2);
+        GPoint second_hand_short = make_hand_point(mode_time.seconds, 60, len_sec, center);
+        
         // Use loops
         for(int y = 0; y < THICKNESS - 1; y++) {
             for(int x = 0; x < THICKNESS - 1; x++) {
