@@ -82,7 +82,7 @@ function getAppVersionAndNews() {
          'GET',
          function(responseText) {
          var json = JSON.parse(responseText);
-         $('#latest_version')[0].innerHTML = 'Latest version: ' + json.thin_ext;
+         $('#latest_version')[0].innerHTML = '' + json.thin_ext;
          $('#latest_news')[0].innerHTML = '' + json.thin_ext_news;
          }
          );
@@ -91,8 +91,8 @@ function getAppVersionAndNews() {
     var index = version.indexOf('version=');
     if(index > 0) {
         version = version.substring(index + 'version='.length);
-        $('#current_version')[0].innerHTML = 'Current version: ' + version;
+        $('#current_version')[0].innerHTML = '' + version;
     } else {
-        $('#current_version')[0].innerHTML = 'Error determining local version. Running in the emulator?';
+        $('#current_version')[0].innerHTML = 'Error determining version. Running in the emulator?';
     }
 }
