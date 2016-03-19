@@ -87,12 +87,10 @@ function getAppVersionAndNews() {
          }
          );
     
-    var version = '' + document.location;
-    var index = version.indexOf('version=');
-    if(index > 0) {
-        version = version.substring(index + 'version='.length);
-        $('#current_version')[0].innerHTML = '' + version;
-    } else {
+    var version = getQueryParam('version', 'unknown');
+    if(version === 'unknown') {
         $('#current_version')[0].innerHTML = 'Error determining version. Running in the emulator?';
+    } else {
+        $('#current_version')[0].innerHTML = '' + version;
     }
 }
