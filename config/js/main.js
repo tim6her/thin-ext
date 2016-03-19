@@ -20,18 +20,15 @@ function submitHandler() {
 function loadOptions() {
     if (localStorage.config) {
         var config = JSON.parse(localStorage.config);
-        $('#backgroundColorPicker')[0].value = config.backgroundColor;
-        $('#timeFormatCheckbox')[0].checked = config.twentyFourHourFormat === 'true';
+        $('#light_theme')[0].checked = config.light_theme === 'true';
     }
 }
 
 function getConfigData() {
-    var $backgroundColorPicker = $('#backgroundColorPicker');
-    var $timeFormatCheckbox = $('#timeFormatCheckbox');
+    var $timeFormatCheckbox = ;
     
     var options = {
-    backgroundColor: $backgroundColorPicker.val(),
-    twentyFourHourFormat: $timeFormatCheckbox[0].checked
+        light_theme: $('#light_theme')[0].checked
     };
     
     
