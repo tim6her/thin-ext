@@ -20,13 +20,14 @@ function submitHandler() {
 function loadOptions() {
     if (localStorage.config) {
         var config = JSON.parse(localStorage.config);
-        $('[name="light_theme"]').val(config.light_theme);
+        $('[name="light_theme"]').removeClass("active");
+        $('[name="light_theme"][value="' + config.light_theme + '"]').addClass("active");
     }
 }
 
 function getConfigData() {
     var options = {
-        light_theme: $('[name="light_theme"]').val() === 'true'
+        light_theme: $('[name="light_theme"].active')[0].attributes.value.value === 'true'
     };
     
     

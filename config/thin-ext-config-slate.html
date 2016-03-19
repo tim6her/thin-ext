@@ -24,14 +24,10 @@
     <div class="item-container-header">Theme</div>
     <div class="item-container-content">
         <div class="item-container-content">
-            <label class="item">
-                Dark
-                <input type="radio" class="item-radio" name="light_theme" value="false" checked>
-                    </label>
-            <label class="item">
-                Light
-                <input type="radio" class="item-radio" name="light_theme" value="true">
-                    </label>
+            <div class="item tab-buttons">
+                <a name="light_theme" class="tab-button active" value="false">Dark</a>
+                <a name="light_theme" class="tab-button" value="true">Light</a>
+            </div>
         </div>
     </div>
     <div class="item-container-footer">
@@ -45,7 +41,9 @@
       <label class='item'>
         asdfe
         <input id='asdf' type='checkbox' class='item-checkbox' checked>
-      </label>
+              </label>
+      <div class="item-subtitle">Some example subtitle</div>
+
       <div class="item">White background, dark grey hands and markers</div>
     </div>
   </div>
