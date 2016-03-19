@@ -25,8 +25,6 @@ function loadOptions() {
 }
 
 function getConfigData() {
-    var $timeFormatCheckbox = ;
-    
     var options = {
         light_theme: $('#light_theme')[0].checked
     };
