@@ -1,5 +1,5 @@
 {
 	"format": "Project name followed by version number as a string (no v), latest news string as projectnamenews",
-	"thin": "1.9",
-	"thinnews": "Added light theme and energy saving options"
+	"thin-ext": "1.9",
+	"thin-ext-news": "Added light theme, energy saving options and new config page"
 }
