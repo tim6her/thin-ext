@@ -13,8 +13,10 @@ function submitHandler() {
                      
                      var return_to = getQueryParam('return_to', 'pebblejs://close#');
                      var config = getConfigData();
-                     storeConfigData(config);
-                     document.location = return_to + encodeURIComponent(JSON.stringify(config));
+                     var configString = JSON.stringify(config);
+                     storeConfigData(configString);
+                     console.log('Updated config: ' + configString);
+                     document.location = return_to + encodeURIComponent(configString);
                      });
 }
 
@@ -45,14 +47,11 @@ function getConfigData() {
         battery: $('#battery')[0].checked
     };
     
-    
-    console.log('Got options: ' + JSON.stringify(options));
     return options;
 }
 
-function storeConfigData(config) {
-    localStorage.config = JSON.stringify(config);
-    console.log('Stored options: ' + JSON.stringify(config));
+function storeConfigData(configString) {
+    localStorage.config = configString;
 }
 
 function getQueryParam(variable, defaultValue) {
