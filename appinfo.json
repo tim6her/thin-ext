@@ -13,7 +13,7 @@
     "capabilities": [
         "configurable"
     ],
-    "companyName": "Chris Lewis, Silas Graffy",
+    "companyName": "Silas Graffy, based on work by Chris Lewis",
     "enableMultiJS": false,
     "longName": "Thin Extended",
     "projectType": "native",
@@ -28,7 +28,7 @@
         "chalk"
     ],
     "uuid": "bd7500d7-5524-4729-9d20-4acca5c7748d",
-    "versionLabel": "1.9",
+    "versionLabel": "1.0",
     "watchapp": {
         "watchface": true
     }
