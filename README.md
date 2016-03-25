@@ -1,10 +1,12 @@
-# thin
+# Thin Extended
 
 Simple, customizable Pebble watchface with splashes of color. 
 
 Runs on both Pebble/Pebble Steel and Pebble Time/Time Steel/Time Round.
 
-![](screenshots/aplite-1.png) ![](screenshots/basalt-1.png) ![](screenshots/chalk-light.png)
+![](screenshots/aplite.png) ![](screenshots/basalt.png) 
+
+![](screenshots/chalk-light.png) ![](screenshots/basalt-light-empty.png)
 
 Use the config page to adjust which features you want from:
 
@@ -18,5 +20,8 @@ Use the config page to adjust which features you want from:
 - Switch between default (black) and light (white) theme
 - Show battery charging state
 
-![](screenshots/basalt-charging-1.png)
+![](screenshots/basalt-charging.png)
+
+![](screenshots/config.png)
+
 

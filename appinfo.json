@@ -13,7 +13,7 @@
     "capabilities": [
         "configurable"
     ],
-    "companyName": "Silas Graffy, based on work by Chris Lewis",
+    "companyName": "Silas Graffy, Chris Lewis",
     "enableMultiJS": false,
     "longName": "Thin Extended",
     "projectType": "native",
