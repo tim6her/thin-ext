@@ -1,5 +1,5 @@
 {
 	"format": "Project name followed by version number as a string (no v), latest news string as project_name_news",
-	"thin_ext": "1.0",
-	"thin_ext_news": "Extended the awesome Thin watchface by Chris Lewis with a light theme, energy saving options and a new config page."
+	"thin_ext": "1.1",
+	"thin_ext_news": "Improved Energy Efficiency"
 }
