@@ -6,7 +6,7 @@ static Layer *s_canvas_layer, *s_bg_layer;
 
 static Time s_last_time, s_anim_time;
 static char s_weekday_buffer[8], s_month_buffer[8], s_day_in_month_buffer[3];
-static bool s_animating, s_connected;
+static bool s_animating, s_connected, s_draw_second_hand;
 
 static GColor colorForeGround, colorBackGround;
 
@@ -21,9 +21,22 @@ void set_last_time(struct tm *tick_time) {
     s_last_time.seconds = tick_time->tm_sec;
 }
 
+
+static bool get_draw_second_hand()
+{
+    BatteryChargeState state = battery_state_service_peek();
+    return config_get(PERSIST_KEY_SECOND_HAND)
+    && (!config_get(PERSIST_KEY_SECOND_BATTERY) || state.is_plugged || state.charge_percent >= 20.0F )
+    && (!config_get(PERSIST_KEY_SECOND_NIGHT) || (s_last_time.hours > 6 && s_last_time.hours < 23));
+}
+
+static void resubscribe_tick_handler_if_needed(); // fuck missing forward declaration in C :x
+
 static void tick_handler(struct tm *tick_time, TimeUnits changed) {
     
     set_last_time(tick_time);
+    
+    resubscribe_tick_handler_if_needed();
     
     snprintf(s_day_in_month_buffer, sizeof(s_day_in_month_buffer), "%d", s_last_time.days);
     strftime(s_weekday_buffer, sizeof(s_weekday_buffer), "%a", tick_time);
@@ -37,20 +50,38 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
     layer_mark_dirty(s_canvas_layer);
 }
 
+
+static void subscribe_tick_handler() {
+    if(s_draw_second_hand) {
+        tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
+    } else {
+        tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
+    }
+}
+
+static void resubscribe_tick_handler_if_needed() {
+    bool new_draw_second_hand = get_draw_second_hand();
+    if (new_draw_second_hand != s_draw_second_hand)
+    {
+        s_draw_second_hand = new_draw_second_hand;
+        tick_timer_service_unsubscribe();
+        subscribe_tick_handler();
+    }
+}
+
+
+
 /****************************** AnimationImplementation ***********************/
 
 static void animation_started(Animation *anim, void *context) {
     s_animating = true;
 }
 
+
 static void animation_stopped(Animation *anim, bool stopped, void *context) {
     s_animating = false;
     
-    if(config_get(PERSIST_KEY_SECOND_HAND)) {
-        tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
-    } else {
-        tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
-    }
+    subscribe_tick_handler();
     
 #ifdef PBL_SDK_2
     animation_destroy(anim);
@@ -159,13 +190,10 @@ void draw_center(GContext *ctx, GPoint center) {
     }
 }
 
+
 void draw_second_hand(GPoint center, Time mode_time, GContext *ctx) {
-    BatteryChargeState state = battery_state_service_peek();
-    if(config_get(PERSIST_KEY_SECOND_HAND)
-       && (!config_get(PERSIST_KEY_SECOND_BATTERY) || state.is_plugged || state.charge_percent >= 20.0F )
-       && (!config_get(PERSIST_KEY_SECOND_NIGHT) || (s_last_time.hours > 6 && s_last_time.hours < 23))
-       ) {
-        
+    
+    if(s_draw_second_hand) {
         int len_sec = HAND_LENGTH_SEC;
         
         // Longer when no markers?
@@ -402,6 +430,8 @@ void main_window_push() {
         bluetooth_connection_service_subscribe(bt_handler);
         bt_handler(bluetooth_connection_service_peek());
     }
+    
+    s_draw_second_hand = get_draw_second_hand();
     
     // Begin smooth animation
     static AnimationImplementation hands_impl = {
