@@ -57,6 +57,7 @@ static void subscribe_tick_handler() {
     } else {
         tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
     }
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "tick subscribed %d", s_draw_second_hand);
 }
 
 static void resubscribe_tick_handler_if_needed() {
@@ -64,6 +65,7 @@ static void resubscribe_tick_handler_if_needed() {
     if (new_draw_second_hand != s_draw_second_hand)
     {
         s_draw_second_hand = new_draw_second_hand;
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "tick unsubscribed");
         tick_timer_service_unsubscribe();
         subscribe_tick_handler();
     }
