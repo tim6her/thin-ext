@@ -1,12 +1,12 @@
-var VERSION = "1.0";
+var VERSION = "1.1";
 
 Pebble.addEventListener('ready', function(e) {
   console.log('PebbleKit JS ready! Version: ' + VERSION);
 });
 
 Pebble.addEventListener('showConfiguration', function(e) {
-  // Pebble.openURL('https://rawgit.com/silasg/thin-ext/master/config/thin-ext-config.html?version=' + VERSION);
-  Pebble.openURL('https://cdn.rawgit.com/silasg/thin-ext/v1.0/config/thin-ext-config.html?version=' + VERSION);
+  //Pebble.openURL('https://rawgit.com/silasg/thin-ext/master/config/thin-ext-config.html?version=' + VERSION);
+  Pebble.openURL('https://cdn.rawgit.com/silasg/thin-ext/v1.1/config/thin-ext-config.html?version=' + VERSION);
 });
 
 Pebble.addEventListener('webviewclosed', function(e) {
