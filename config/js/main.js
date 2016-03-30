@@ -77,7 +77,7 @@ function ajax(url, type, callback) {
 
 function getAppVersionAndNews() {
     ajax(
-         'https://cdn.rawgit.com/silasg/thin-ext/latest-release/config/app_versions.json',
+         'https://rawgit.com/silasg/thin-ext/latest-release/config/app_versions.json',
          'GET',
          function(responseText) {
          var json = JSON.parse(responseText);
