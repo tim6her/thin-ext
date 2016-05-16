@@ -1,5 +1,5 @@
 {
-	"format": "Project name followed by version number as a string (no v), latest news string as project_name_news",
-	"thin_ext": "1.2",
-	"thin_ext_news": "Reduced hand tip's size, added option to show additional minute markers"
+    "format": "Project name followed by version number as a string (no v), latest news string as project_name_news",
+    "thin_ext": "1.2",
+    "thin_ext_news": "Reduced hand tips' size on color displays and hands rendering on monochrome dispays, added options to show additional minute markers or to hide markers and enlarge hands instead"
 }

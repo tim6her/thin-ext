@@ -214,21 +214,22 @@ static int get_rectangular_marker_extension(int handPosition) {
 #endif
 
 static int get_marker_extension(Time time, int forHand) {
+    int result = PBL_IF_COLOR_ELSE(0, 2);
     if (!config_get(PERSIST_KEY_NO_MARKERS)) {
-        return 0;
+        return result;
     }
     else {
 #ifdef PBL_ROUND
-        return 20;
+        return result+20;
 #else
         if (forHand == TIME_MINUTES) {
-            return get_rectangular_marker_extension(time.minutes);
+            return result+get_rectangular_marker_extension(time.minutes);
         }
         else if (forHand == TIME_SECONDS) {
-            return get_rectangular_marker_extension(time.seconds);
+            return result+get_rectangular_marker_extension(time.seconds);
         }
         else { // hours
-            return 5; // don't change hours hand length depending on current time
+            return result+5; // don't change hours hand length depending on current time
         }
 #endif
     }
@@ -242,7 +243,9 @@ void draw_second_hand(GPoint center, Time mode_time, GContext *ctx) {
     len_sec += get_marker_extension(mode_time, TIME_SECONDS);
     
     // Draw second hand
+#ifdef PBL_COLOR
     GPoint second_hand_long = make_hand_point(mode_time.seconds, 60, len_sec, center);
+#endif
     len_sec -= (MARGIN + HAND_TIP_SIZE_DELTA);
     GPoint second_hand_short = make_hand_point(mode_time.seconds, 60, len_sec, center);
     
@@ -252,9 +255,11 @@ void draw_second_hand(GPoint center, Time mode_time, GContext *ctx) {
             graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(colorSecondHand, colorForeGround));
             graphics_draw_line(ctx, GPoint(center.x + x, center.y + y), GPoint(second_hand_short.x + x, second_hand_short.y + y));
             
+#ifdef PBL_COLOR
             // Draw second hand tip
             graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(colorAccent, colorForeGround));
             graphics_draw_line(ctx, GPoint(second_hand_short.x + x, second_hand_short.y + y), GPoint(second_hand_long.x + x, second_hand_long.y + y));
+#endif
         }
     }
 }
@@ -268,7 +273,9 @@ void draw_min_hour_hands(GPoint center, Time mode_time, GContext *ctx) {
     len_hour += get_marker_extension(mode_time, TIME_HOURS);
     
     // Plot hand ends
+#ifdef PBL_COLOR
     GPoint minute_hand_long = make_hand_point(mode_time.minutes, 60, len_min, center);
+#endif
     
     // Plot shorter overlaid hands
     len_min -= (MARGIN + HAND_TIP_SIZE_DELTA);
@@ -285,10 +292,12 @@ void draw_min_hour_hands(GPoint center, Time mode_time, GContext *ctx) {
     hour_angle += (minute_angle / TRIG_MAX_ANGLE) * (TRIG_MAX_ANGLE / 12);
     
     // Hour is more accurate
+#ifdef PBL_COLOR
     GPoint hour_hand_long = (GPoint) {
         .x = (int16_t)(sin_lookup(hour_angle) * (int32_t)len_hour / TRIG_MAX_RATIO) + center.x,
         .y = (int16_t)(-cos_lookup(hour_angle) * (int32_t)len_hour / TRIG_MAX_RATIO) + center.y,
     };
+#endif
     
     // Shorter hour overlay
     len_hour -= (MARGIN + HAND_TIP_SIZE_DELTA);
@@ -305,6 +314,8 @@ void draw_min_hour_hands(GPoint center, Time mode_time, GContext *ctx) {
             graphics_draw_line(ctx, GPoint(center.x + x, center.y + y), GPoint(hour_hand_short.x + x, hour_hand_short.y + y));
         }
     }
+#ifdef PBL_COLOR
+    // Draw hand tips
     graphics_context_set_stroke_color(ctx, colorForeGround);
     for(int y = 0; y < THICKNESS; y++) {
         for(int x = 0; x < THICKNESS; x++) {
@@ -312,6 +323,7 @@ void draw_min_hour_hands(GPoint center, Time mode_time, GContext *ctx) {
             graphics_draw_line(ctx, GPoint(hour_hand_short.x + x, hour_hand_short.y + y), GPoint(hour_hand_long.x + x, hour_hand_long.y + y));
         }
     }
+#endif
 }
 
 static void update_hands_layer(Layer *layer, GContext *ctx) {
