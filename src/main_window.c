@@ -205,13 +205,41 @@ void draw_center(GContext *ctx, GPoint center) {
 }
 
 
+#ifndef PBL_ROUND
+static int get_rectangular_marker_extension(int handPosition) {
+    int pos = (handPosition % 30)-15;
+    if (pos<0) pos*=-1; // TODO: use Math.Abs() instead
+    return pos/2 + 2;
+}
+#endif
+
+static int get_marker_extension(Time time, int forHand) {
+    if (!config_get(PERSIST_KEY_NO_MARKERS)) {
+        return 0;
+    }
+    else {
+#ifdef PBL_ROUND
+        return 20;
+#else
+        if (forHand == TIME_MINUTES) {
+            return get_rectangular_marker_extension(time.minutes);
+        }
+        else if (forHand == TIME_SECONDS) {
+            return get_rectangular_marker_extension(time.seconds);
+        }
+        else { // hours
+            return 5; // don't change hours hand length depending on current time
+        }
+#endif
+    }
+}
+
 void draw_second_hand(GPoint center, Time mode_time, GContext *ctx) {
     
     int len_sec = HAND_LENGTH_SEC;
         
     // Longer when no markers?
-    if(config_get(PERSIST_KEY_NO_MARKERS))
-    len_sec += 20;
+    len_sec += get_marker_extension(mode_time, TIME_SECONDS);
     
     // Draw second hand
     GPoint second_hand_long = make_hand_point(mode_time.seconds, 60, len_sec, center);
@@ -236,10 +264,8 @@ void draw_min_hour_hands(GPoint center, Time mode_time, GContext *ctx) {
     int len_hour = HAND_LENGTH_HOUR;
     
     // Longer when no markers?
-    if(config_get(PERSIST_KEY_NO_MARKERS)) {
-        len_min += 20;
-        len_hour += 20;
-    }
+    len_min += get_marker_extension(mode_time, TIME_MINUTES);
+    len_hour += get_marker_extension(mode_time, TIME_HOURS);
     
     // Plot hand ends
     GPoint minute_hand_long = make_hand_point(mode_time.minutes, 60, len_min, center);

@@ -33,6 +33,7 @@ function loadOptions() {
         $('#bluetooth')[0].checked = config.bluetooth;
         $('#battery')[0].checked = config.battery;
         $('#minute_markers')[0].checked = config.minute_markers;
+        $('#no_markers')[0].checked = config.no_markers;
     }
 }
 
@@ -46,7 +47,8 @@ function getConfigData() {
         bluetooth: $('#bluetooth')[0].checked,
         day: $('#day')[0].checked,
         battery: $('#battery')[0].checked,
-        minute_markers: $('#minute_markers')[0].checked
+        minute_markers: $('#minute_markers')[0].checked,
+        no_markers: $('#no_markers')[0].checked
     };
     
     return options;

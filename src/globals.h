@@ -33,3 +33,7 @@ typedef struct {
   int minutes;
   int seconds;
 } Time;
+
+#define TIME_HOURS 1
+#define TIME_MINUTES 2
+#define TIME_SECONDS 4
