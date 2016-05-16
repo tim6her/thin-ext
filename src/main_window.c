@@ -121,9 +121,11 @@ void draw_markers(Layer *layer, GContext *ctx) {
     for(int m = 0; m < 60; m++) {
         int h = m / 5;
         bool isHourMarker = ( m % 5 ) == 0;
-        int thickness = isHourMarker ? THICKNESS : 1;
         
         if (!isHourMarker &&  ( m < mmin || m > mmax )) continue;
+        
+        int thickness = isHourMarker ? THICKNESS : 1;
+        
         
         for(int y = 0; y < thickness; y++) {
             for(int x = 0; x < thickness; x++) {
