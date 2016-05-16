@@ -115,12 +115,22 @@ void draw_markers(Layer *layer, GContext *ctx) {
     int perc = state.charge_percent;
     int batt_hours = (int)(12.0F * ((float)perc / 100.0F)) + 1;
     
-    for(int h = 0; h < 12; h++) {
-        for(int y = 0; y < THICKNESS; y++) {
-            for(int x = 0; x < THICKNESS; x++) {
+    int mmin = ( s_last_time.minutes / 5 ) * 5;
+    int mmax = ( mmin + 5 );
+    
+    for(int m = 0; m < 60; m++) {
+        int h = m / 5;
+        bool isHourMarker = ( m % 5 ) == 0;
+        int thickness = isHourMarker ? THICKNESS : 1;
+        
+        if (!isHourMarker &&  ( m < mmin || m > mmax )) continue;
+        
+        for(int y = 0; y < thickness; y++) {
+            for(int x = 0; x < thickness; x++) {
+
                 GPoint point = (GPoint) {
-                    .x = (int16_t)(sin_lookup(TRIG_MAX_ANGLE * h / 12) * (int32_t)(3 * HAND_LENGTH_SEC) / TRIG_MAX_RATIO) + center.x,
-                    .y = (int16_t)(-cos_lookup(TRIG_MAX_ANGLE * h / 12) * (int32_t)(3 * HAND_LENGTH_SEC) / TRIG_MAX_RATIO) + center.y,
+                    .x = (int16_t)(sin_lookup(TRIG_MAX_ANGLE * m / 60) * (int32_t)(3 * HAND_LENGTH_SEC) / TRIG_MAX_RATIO) + center.x,
+                    .y = (int16_t)(-cos_lookup(TRIG_MAX_ANGLE * m / 60) * (int32_t)(3 * HAND_LENGTH_SEC) / TRIG_MAX_RATIO) + center.y,
                 };
                 
                 if(config_get(PERSIST_KEY_BATTERY)) {
