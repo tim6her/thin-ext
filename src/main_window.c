@@ -177,7 +177,7 @@ static GPoint make_hand_point(int quantity, int intervals, int len, GPoint cente
 }
 
 static int hours_to_minutes(int hours_out_of_12) {
-    return (int)(float)(((float)hours_out_of_12 / 12.0F) * 60.0F);
+    return (hours_out_of_12 * 60) / 12;
 }
 
 void draw_center(GContext *ctx, GPoint center) {
@@ -203,7 +203,7 @@ void draw_second_hand(GPoint center, Time mode_time, GContext *ctx) {
     
     // Draw second hand
     GPoint second_hand_long = make_hand_point(mode_time.seconds, 60, len_sec, center);
-    len_sec -= (MARGIN + 2);
+    len_sec -= (MARGIN + HAND_TIP_SIZE_DELTA);
     GPoint second_hand_short = make_hand_point(mode_time.seconds, 60, len_sec, center);
     
     // Use loops
@@ -233,7 +233,7 @@ void draw_min_hour_hands(GPoint center, Time mode_time, GContext *ctx) {
     GPoint minute_hand_long = make_hand_point(mode_time.minutes, 60, len_min, center);
     
     // Plot shorter overlaid hands
-    len_min -= (MARGIN + 2);
+    len_min -= (MARGIN + HAND_TIP_SIZE_DELTA);
     GPoint minute_hand_short = make_hand_point(mode_time.minutes, 60, len_min, center);
     
     float minute_angle = TRIG_MAX_ANGLE * mode_time.minutes / 60;
@@ -253,7 +253,7 @@ void draw_min_hour_hands(GPoint center, Time mode_time, GContext *ctx) {
     };
     
     // Shorter hour overlay
-    len_hour -= (MARGIN + 2);
+    len_hour -= (MARGIN + HAND_TIP_SIZE_DELTA);
     GPoint hour_hand_short = (GPoint) {
         .x = (int16_t)(sin_lookup(hour_angle) * (int32_t)len_hour / TRIG_MAX_RATIO) + center.x,
         .y = (int16_t)(-cos_lookup(hour_angle) * (int32_t)len_hour / TRIG_MAX_RATIO) + center.y,
