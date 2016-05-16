@@ -23,8 +23,9 @@
 #define PERSIST_KEY_NO_MARKERS  5
 #define PERSIST_KEY_LIGHT_THEME 6
 #define PERSIST_KEY_SECOND_BATTERY 7
-#define PERSIST_KEY_SECOND_NIGHT 8 
-#define NUM_SETTINGS            9
+#define PERSIST_KEY_SECOND_NIGHT 8
+#define PERSIST_KEY_MINUTE_MARKERS 9
+#define NUM_SETTINGS            10
 
 typedef struct {
   int days;

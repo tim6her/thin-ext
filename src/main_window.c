@@ -27,7 +27,7 @@ static bool get_draw_second_hand()
     BatteryChargeState state = battery_state_service_peek();
     return config_get(PERSIST_KEY_SECOND_HAND)
     && (!config_get(PERSIST_KEY_SECOND_BATTERY) || state.is_plugged || state.charge_percent >= 20.0F )
-    && (!config_get(PERSIST_KEY_SECOND_NIGHT) ||  (s_last_time.hours > 6 && s_last_time.hours < 23)/* s_last_time.minutes % 4 < 2*/);
+    && (!config_get(PERSIST_KEY_SECOND_NIGHT) ||  (s_last_time.hours > 6 && s_last_time.hours < 23));
 }
 
 static void resubscribe_tick_handler_if_needed(); // fuck missing forward declaration in C :x
@@ -115,14 +115,14 @@ void draw_markers(Layer *layer, GContext *ctx) {
     int perc = state.charge_percent;
     int batt_hours = (int)(12.0F * ((float)perc / 100.0F)) + 1;
     
-    int mmin = ( s_last_time.minutes / 5 ) * 5;
-    int mmax = ( mmin + 5 );
+    int mmin = (s_last_time.minutes / 5) * 5;
+    int mmax = (mmin + 5);
     
-    for(int m = 0; m < 60; m++) {
+    for(int m = 0; m < 60; m+=(config_get(PERSIST_KEY_MINUTE_MARKERS) ? 1 : 5)) {
         int h = m / 5;
         bool isHourMarker = ( m % 5 ) == 0;
         
-        if (!isHourMarker &&  ( m < mmin || m > mmax )) continue;
+        if (!isHourMarker && ( m < mmin || m > mmax )) continue;
         
         int thickness = isHourMarker ? THICKNESS : 1;
         

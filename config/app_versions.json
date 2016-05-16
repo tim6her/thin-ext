@@ -1,5 +1,5 @@
 {
 	"format": "Project name followed by version number as a string (no v), latest news string as project_name_news",
-	"thin_ext": "1.1",
-	"thin_ext_news": "Improved Energy Efficiency"
+	"thin_ext": "1.2",
+	"thin_ext_news": "Reduced hand tip's size, added option to show additional minute markers"
 }

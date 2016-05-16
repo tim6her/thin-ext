@@ -8,7 +8,8 @@
         "PERSIST_KEY_NO_MARKERS": 5,
         "PERSIST_KEY_SECOND_BATTERY": 7,
         "PERSIST_KEY_SECOND_HAND": 4,
-        "PERSIST_KEY_SECOND_NIGHT": 8
+        "PERSIST_KEY_SECOND_NIGHT": 8,
+        "PERSIST_KEY_MINUTE_MARKERS": 9
     },
     "capabilities": [
         "configurable"

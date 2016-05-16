@@ -21,7 +21,8 @@ Pebble.addEventListener('webviewclosed', function(e) {
     "PERSIST_KEY_SECOND_BATTERY": '' + json.second_battery,
     "PERSIST_KEY_SECOND_NIGHT": '' + json.second_night,
     "PERSIST_KEY_NO_MARKERS": '' + json.no_markers,
-    "PERSIST_KEY_LIGHT_THEME": '' + json.light_theme
+                        "PERSIST_KEY_LIGHT_THEME": '' + json.light_theme,
+                        "PERSIST_KEY_MINUTE_MARKERS": '' + json.minute_markers
   };
 
   Pebble.sendAppMessage(options, function(e) {
