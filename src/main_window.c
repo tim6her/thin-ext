@@ -440,9 +440,9 @@ void set_colors(void) {
 #ifdef PBL_COLOR
         colorLight = GColorDarkGray;
         colorHeavy = GColorDarkGray;
-        colorGreen = GColorJaegerGreen;
-        colorSecondHand = GColorRed;
-        colorAccent = GColorDarkCandyAppleRed;
+        colorGreen = GColorIslamicGreen;
+        colorSecondHand = GColorFolly;
+        colorAccent = GColorRed;
 #endif
     }
     else {
