@@ -30,7 +30,9 @@ static bool get_draw_second_hand()
     && (!config_get(PERSIST_KEY_SECOND_NIGHT) ||  (s_last_time.hours > 6 && s_last_time.hours < 23));
 }
 
-static void resubscribe_tick_handler_if_needed(); // fuck missing forward declaration in C :x
+// fuck missing forward declaration in C :x
+static void resubscribe_tick_handler_if_needed();
+void main_window_reload_config();
 
 static void tick_handler(struct tm *tick_time, TimeUnits changed) {
     
@@ -83,11 +85,7 @@ static void animation_started(Animation *anim, void *context) {
 static void animation_stopped(Animation *anim, bool stopped, void *context) {
     s_animating = false;
     
-    subscribe_tick_handler();
-    
-#ifdef PBL_SDK_2
-    animation_destroy(anim);
-#endif
+    main_window_reload_config();
 }
 
 static void animate(int duration, int delay, AnimationImplementation *implementation, bool handlers) {
@@ -220,7 +218,7 @@ static int get_marker_extension(Time time, int forHand) {
     }
     else {
 #ifdef PBL_ROUND
-        return result+20;
+        return result+15;
 #else
         if (forHand == TIME_MINUTES) {
             return result+get_rectangular_marker_extension(time.minutes);
@@ -388,7 +386,7 @@ static void window_load(Window *window) {
     layer_set_update_proc(s_bg_layer, update_background_layer);
     layer_add_child(window_layer, s_bg_layer);
     
-    int x = (int)((float)bounds.size.w * (config_get(PERSIST_KEY_NO_MARKERS) ? 0.68F : 0.625F));
+    int x = (bounds.size.w * (config_get(PERSIST_KEY_NO_MARKERS) ? 68 : 62)) / 100;
     
     create_weekday_layer(x);
     
@@ -396,17 +394,11 @@ static void window_load(Window *window) {
     
     create_month_layer(x);
     
-    if(config_get(PERSIST_KEY_DAY)) {
-        layer_add_child(window_layer, text_layer_get_layer(s_day_in_month_layer));
-    }
-    if(config_get(PERSIST_KEY_DATE)) {
-        layer_add_child(window_layer, text_layer_get_layer(s_weekday_layer));
-        layer_add_child(window_layer, text_layer_get_layer(s_month_layer));
-    }
     
     s_canvas_layer = layer_create(bounds);
     layer_set_update_proc(s_canvas_layer, update_hands_layer);
-    layer_add_child(window_layer, s_canvas_layer);
+    
+    //layer_add_child(window_layer, s_canvas_layer);
 }
 
 static void window_unload(Window *window) {
@@ -473,12 +465,6 @@ void main_window_push() {
     
     battery_state_service_subscribe(batt_handler);
     
-    time_t t = time(NULL);
-    struct tm *tm_now = localtime(&t);
-    s_last_time.hours = tm_now->tm_hour;
-    s_last_time.minutes = tm_now->tm_min;
-    s_last_time.seconds = tm_now->tm_sec;  
-    
     if(config_get(PERSIST_KEY_BT)) {
         bluetooth_connection_service_subscribe(bt_handler);
         bt_handler(bluetooth_connection_service_peek());
@@ -491,4 +477,47 @@ void main_window_push() {
         .update = hands_update
     };
     animate(ANIMATION_DURATION, ANIMATION_DELAY, &hands_impl, true);
+    main_window_reload_config();
+}
+
+void main_window_reload_config() {
+    time_t t = time(NULL);
+    struct tm *tm_now = localtime(&t);
+    s_last_time.hours = tm_now->tm_hour;
+    s_last_time.minutes = tm_now->tm_min;
+    s_last_time.seconds = tm_now->tm_sec;
+    
+    tick_timer_service_unsubscribe();
+    
+    if(get_draw_second_hand()) {
+        tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
+    } else {
+        tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
+    }
+    
+    connection_service_unsubscribe();
+    if(config_get(PERSIST_KEY_BT)) {
+        connection_service_subscribe((ConnectionHandlers) {
+            .pebble_app_connection_handler = bt_handler
+        });
+        bt_handler(connection_service_peek_pebble_app_connection());
+    }
+    
+    battery_state_service_unsubscribe();
+    if(config_get(PERSIST_KEY_BATTERY)) {
+        battery_state_service_subscribe(batt_handler);
+    }
+    
+    Layer *window_layer = window_get_root_layer(s_main_window);
+    layer_remove_from_parent(text_layer_get_layer(s_day_in_month_layer));
+    layer_remove_from_parent(text_layer_get_layer(s_weekday_layer));
+    layer_remove_from_parent(text_layer_get_layer(s_month_layer));
+    if(config_get(PERSIST_KEY_DAY)) {
+        layer_add_child(window_layer, text_layer_get_layer(s_day_in_month_layer));
+    }
+    if(config_get(PERSIST_KEY_DATE)) {
+        layer_add_child(window_layer, text_layer_get_layer(s_weekday_layer));
+        layer_add_child(window_layer, text_layer_get_layer(s_month_layer));
+    }
+    layer_add_child(window_layer, s_canvas_layer);
 }
