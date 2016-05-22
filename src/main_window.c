@@ -512,10 +512,10 @@ void main_window_reload_config() {
     layer_remove_from_parent(text_layer_get_layer(s_day_in_month_layer));
     layer_remove_from_parent(text_layer_get_layer(s_weekday_layer));
     layer_remove_from_parent(text_layer_get_layer(s_month_layer));
-    if(config_get(PERSIST_KEY_DAY)) {
+    if(config_get(PERSIST_KEY_DATE)) {
         layer_add_child(window_layer, text_layer_get_layer(s_day_in_month_layer));
     }
-    if(config_get(PERSIST_KEY_DATE)) {
+    if(config_get(PERSIST_KEY_DAY)) {
         layer_add_child(window_layer, text_layer_get_layer(s_weekday_layer));
         layer_add_child(window_layer, text_layer_get_layer(s_month_layer));
     }
