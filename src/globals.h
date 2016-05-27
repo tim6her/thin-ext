@@ -4,10 +4,11 @@
 
 // Layout
 #define MARGIN 5
+#define HAND_TIP_SIZE_DELTA -2
 #define THICKNESS 3
 #define ANIMATION_DELAY 300
 #define ANIMATION_DURATION 1000
-#define HAND_LENGTH_SEC 65
+#define HAND_LENGTH_SEC 68
 #define HAND_LENGTH_MIN HAND_LENGTH_SEC
 #define HAND_LENGTH_HOUR (HAND_LENGTH_SEC - 20)
 
@@ -22,8 +23,9 @@
 #define PERSIST_KEY_NO_MARKERS  5
 #define PERSIST_KEY_LIGHT_THEME 6
 #define PERSIST_KEY_SECOND_BATTERY 7
-#define PERSIST_KEY_SECOND_NIGHT 8 
-#define NUM_SETTINGS            9
+#define PERSIST_KEY_SECOND_NIGHT 8
+#define PERSIST_KEY_MINUTE_MARKERS 9
+#define NUM_SETTINGS            10
 
 typedef struct {
   int days;
@@ -31,3 +33,7 @@ typedef struct {
   int minutes;
   int seconds;
 } Time;
+
+#define TIME_HOURS 1
+#define TIME_MINUTES 2
+#define TIME_SECONDS 4

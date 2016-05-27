@@ -27,10 +27,12 @@ static bool get_draw_second_hand()
     BatteryChargeState state = battery_state_service_peek();
     return config_get(PERSIST_KEY_SECOND_HAND)
     && (!config_get(PERSIST_KEY_SECOND_BATTERY) || state.is_plugged || state.charge_percent >= 20.0F )
-    && (!config_get(PERSIST_KEY_SECOND_NIGHT) ||  (s_last_time.hours > 6 && s_last_time.hours < 23)/* s_last_time.minutes % 4 < 2*/);
+    && (!config_get(PERSIST_KEY_SECOND_NIGHT) ||  (s_last_time.hours > 6 && s_last_time.hours < 23));
 }
 
-static void resubscribe_tick_handler_if_needed(); // fuck missing forward declaration in C :x
+// fuck missing forward declaration in C :x
+static void resubscribe_tick_handler_if_needed();
+void main_window_reload_config();
 
 static void tick_handler(struct tm *tick_time, TimeUnits changed) {
     
@@ -83,11 +85,7 @@ static void animation_started(Animation *anim, void *context) {
 static void animation_stopped(Animation *anim, bool stopped, void *context) {
     s_animating = false;
     
-    subscribe_tick_handler();
-    
-#ifdef PBL_SDK_2
-    animation_destroy(anim);
-#endif
+    main_window_reload_config();
 }
 
 static void animate(int duration, int delay, AnimationImplementation *implementation, bool handlers) {
@@ -115,12 +113,24 @@ void draw_markers(Layer *layer, GContext *ctx) {
     int perc = state.charge_percent;
     int batt_hours = (int)(12.0F * ((float)perc / 100.0F)) + 1;
     
-    for(int h = 0; h < 12; h++) {
-        for(int y = 0; y < THICKNESS; y++) {
-            for(int x = 0; x < THICKNESS; x++) {
+    int mmin = (s_last_time.minutes / 5) * 5;
+    int mmax = (mmin + 5);
+    
+    for(int m = 0; m < 60; m+=(config_get(PERSIST_KEY_MINUTE_MARKERS) ? 1 : 5)) {
+        int h = m / 5;
+        bool isHourMarker = ( m % 5 ) == 0;
+        
+        if (!isHourMarker && ( m < mmin || m > mmax )) continue;
+        
+        int thickness = isHourMarker ? THICKNESS : 1;
+        
+        
+        for(int y = 0; y < thickness; y++) {
+            for(int x = 0; x < thickness; x++) {
+
                 GPoint point = (GPoint) {
-                    .x = (int16_t)(sin_lookup(TRIG_MAX_ANGLE * h / 12) * (int32_t)(3 * HAND_LENGTH_SEC) / TRIG_MAX_RATIO) + center.x,
-                    .y = (int16_t)(-cos_lookup(TRIG_MAX_ANGLE * h / 12) * (int32_t)(3 * HAND_LENGTH_SEC) / TRIG_MAX_RATIO) + center.y,
+                    .x = (int16_t)(sin_lookup(TRIG_MAX_ANGLE * m / 60) * (int32_t)(3 * HAND_LENGTH_SEC) / TRIG_MAX_RATIO) + center.x,
+                    .y = (int16_t)(-cos_lookup(TRIG_MAX_ANGLE * m / 60) * (int32_t)(3 * HAND_LENGTH_SEC) / TRIG_MAX_RATIO) + center.y,
                 };
                 
                 if(config_get(PERSIST_KEY_BATTERY)) {
@@ -177,7 +187,7 @@ static GPoint make_hand_point(int quantity, int intervals, int len, GPoint cente
 }
 
 static int hours_to_minutes(int hours_out_of_12) {
-    return (int)(float)(((float)hours_out_of_12 / 12.0F) * 60.0F);
+    return (hours_out_of_12 * 60) / 12;
 }
 
 void draw_center(GContext *ctx, GPoint center) {
@@ -193,17 +203,48 @@ void draw_center(GContext *ctx, GPoint center) {
 }
 
 
+#ifndef PBL_ROUND
+static int get_rectangular_marker_extension(int handPosition) {
+    int pos = (handPosition % 30)-15;
+    if (pos<0) pos*=-1; // TODO: use Math.Abs() instead
+    return pos/2 + 2;
+}
+#endif
+
+static int get_marker_extension(Time time, int forHand) {
+    int result = PBL_IF_COLOR_ELSE(0, 2);
+    if (!config_get(PERSIST_KEY_NO_MARKERS)) {
+        return result;
+    }
+    else {
+#ifdef PBL_ROUND
+        return result+15;
+#else
+        if (forHand == TIME_MINUTES) {
+            return result+get_rectangular_marker_extension(time.minutes);
+        }
+        else if (forHand == TIME_SECONDS) {
+            return result+get_rectangular_marker_extension(time.seconds);
+        }
+        else { // hours
+            return result+5; // don't change hours hand length depending on current time
+        }
+#endif
+    }
+}
+
 void draw_second_hand(GPoint center, Time mode_time, GContext *ctx) {
     
     int len_sec = HAND_LENGTH_SEC;
         
     // Longer when no markers?
-    if(config_get(PERSIST_KEY_NO_MARKERS))
-    len_sec += 20;
+    len_sec += get_marker_extension(mode_time, TIME_SECONDS);
     
     // Draw second hand
+#ifdef PBL_COLOR
     GPoint second_hand_long = make_hand_point(mode_time.seconds, 60, len_sec, center);
-    len_sec -= (MARGIN + 2);
+#endif
+    len_sec -= (MARGIN + HAND_TIP_SIZE_DELTA);
     GPoint second_hand_short = make_hand_point(mode_time.seconds, 60, len_sec, center);
     
     // Use loops
@@ -212,9 +253,11 @@ void draw_second_hand(GPoint center, Time mode_time, GContext *ctx) {
             graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(colorSecondHand, colorForeGround));
             graphics_draw_line(ctx, GPoint(center.x + x, center.y + y), GPoint(second_hand_short.x + x, second_hand_short.y + y));
             
+#ifdef PBL_COLOR
             // Draw second hand tip
             graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(colorAccent, colorForeGround));
             graphics_draw_line(ctx, GPoint(second_hand_short.x + x, second_hand_short.y + y), GPoint(second_hand_long.x + x, second_hand_long.y + y));
+#endif
         }
     }
 }
@@ -224,16 +267,16 @@ void draw_min_hour_hands(GPoint center, Time mode_time, GContext *ctx) {
     int len_hour = HAND_LENGTH_HOUR;
     
     // Longer when no markers?
-    if(config_get(PERSIST_KEY_NO_MARKERS)) {
-        len_min += 20;
-        len_hour += 20;
-    }
+    len_min += get_marker_extension(mode_time, TIME_MINUTES);
+    len_hour += get_marker_extension(mode_time, TIME_HOURS);
     
     // Plot hand ends
+#ifdef PBL_COLOR
     GPoint minute_hand_long = make_hand_point(mode_time.minutes, 60, len_min, center);
+#endif
     
     // Plot shorter overlaid hands
-    len_min -= (MARGIN + 2);
+    len_min -= (MARGIN + HAND_TIP_SIZE_DELTA);
     GPoint minute_hand_short = make_hand_point(mode_time.minutes, 60, len_min, center);
     
     float minute_angle = TRIG_MAX_ANGLE * mode_time.minutes / 60;
@@ -247,13 +290,15 @@ void draw_min_hour_hands(GPoint center, Time mode_time, GContext *ctx) {
     hour_angle += (minute_angle / TRIG_MAX_ANGLE) * (TRIG_MAX_ANGLE / 12);
     
     // Hour is more accurate
+#ifdef PBL_COLOR
     GPoint hour_hand_long = (GPoint) {
         .x = (int16_t)(sin_lookup(hour_angle) * (int32_t)len_hour / TRIG_MAX_RATIO) + center.x,
         .y = (int16_t)(-cos_lookup(hour_angle) * (int32_t)len_hour / TRIG_MAX_RATIO) + center.y,
     };
+#endif
     
     // Shorter hour overlay
-    len_hour -= (MARGIN + 2);
+    len_hour -= (MARGIN + HAND_TIP_SIZE_DELTA);
     GPoint hour_hand_short = (GPoint) {
         .x = (int16_t)(sin_lookup(hour_angle) * (int32_t)len_hour / TRIG_MAX_RATIO) + center.x,
         .y = (int16_t)(-cos_lookup(hour_angle) * (int32_t)len_hour / TRIG_MAX_RATIO) + center.y,
@@ -267,6 +312,8 @@ void draw_min_hour_hands(GPoint center, Time mode_time, GContext *ctx) {
             graphics_draw_line(ctx, GPoint(center.x + x, center.y + y), GPoint(hour_hand_short.x + x, hour_hand_short.y + y));
         }
     }
+#ifdef PBL_COLOR
+    // Draw hand tips
     graphics_context_set_stroke_color(ctx, colorForeGround);
     for(int y = 0; y < THICKNESS; y++) {
         for(int x = 0; x < THICKNESS; x++) {
@@ -274,6 +321,7 @@ void draw_min_hour_hands(GPoint center, Time mode_time, GContext *ctx) {
             graphics_draw_line(ctx, GPoint(hour_hand_short.x + x, hour_hand_short.y + y), GPoint(hour_hand_long.x + x, hour_hand_long.y + y));
         }
     }
+#endif
 }
 
 static void update_hands_layer(Layer *layer, GContext *ctx) {
@@ -338,7 +386,7 @@ static void window_load(Window *window) {
     layer_set_update_proc(s_bg_layer, update_background_layer);
     layer_add_child(window_layer, s_bg_layer);
     
-    int x = (int)((float)bounds.size.w * (config_get(PERSIST_KEY_NO_MARKERS) ? 0.68F : 0.625F));
+    int x = (bounds.size.w * (config_get(PERSIST_KEY_NO_MARKERS) ? 68 : 62)) / 100;
     
     create_weekday_layer(x);
     
@@ -346,17 +394,11 @@ static void window_load(Window *window) {
     
     create_month_layer(x);
     
-    if(config_get(PERSIST_KEY_DAY)) {
-        layer_add_child(window_layer, text_layer_get_layer(s_day_in_month_layer));
-    }
-    if(config_get(PERSIST_KEY_DATE)) {
-        layer_add_child(window_layer, text_layer_get_layer(s_weekday_layer));
-        layer_add_child(window_layer, text_layer_get_layer(s_month_layer));
-    }
     
     s_canvas_layer = layer_create(bounds);
     layer_set_update_proc(s_canvas_layer, update_hands_layer);
-    layer_add_child(window_layer, s_canvas_layer);
+    
+    //layer_add_child(window_layer, s_canvas_layer);
 }
 
 static void window_unload(Window *window) {
@@ -390,9 +432,9 @@ void set_colors(void) {
 #ifdef PBL_COLOR
         colorLight = GColorDarkGray;
         colorHeavy = GColorDarkGray;
-        colorGreen = GColorJaegerGreen;
-        colorSecondHand = GColorRed;
-        colorAccent = GColorDarkCandyAppleRed;
+        colorGreen = GColorIslamicGreen;
+        colorSecondHand = GColorFolly;
+        colorAccent = GColorRed;
 #endif
     }
     else {
@@ -423,12 +465,6 @@ void main_window_push() {
     
     battery_state_service_subscribe(batt_handler);
     
-    time_t t = time(NULL);
-    struct tm *tm_now = localtime(&t);
-    s_last_time.hours = tm_now->tm_hour;
-    s_last_time.minutes = tm_now->tm_min;
-    s_last_time.seconds = tm_now->tm_sec;  
-    
     if(config_get(PERSIST_KEY_BT)) {
         bluetooth_connection_service_subscribe(bt_handler);
         bt_handler(bluetooth_connection_service_peek());
@@ -441,4 +477,47 @@ void main_window_push() {
         .update = hands_update
     };
     animate(ANIMATION_DURATION, ANIMATION_DELAY, &hands_impl, true);
+    main_window_reload_config();
+}
+
+void main_window_reload_config() {
+    time_t t = time(NULL);
+    struct tm *tm_now = localtime(&t);
+    s_last_time.hours = tm_now->tm_hour;
+    s_last_time.minutes = tm_now->tm_min;
+    s_last_time.seconds = tm_now->tm_sec;
+    
+    tick_timer_service_unsubscribe();
+    
+    if(get_draw_second_hand()) {
+        tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
+    } else {
+        tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
+    }
+    
+    connection_service_unsubscribe();
+    if(config_get(PERSIST_KEY_BT)) {
+        connection_service_subscribe((ConnectionHandlers) {
+            .pebble_app_connection_handler = bt_handler
+        });
+        bt_handler(connection_service_peek_pebble_app_connection());
+    }
+    
+    battery_state_service_unsubscribe();
+    if(config_get(PERSIST_KEY_BATTERY)) {
+        battery_state_service_subscribe(batt_handler);
+    }
+    
+    Layer *window_layer = window_get_root_layer(s_main_window);
+    layer_remove_from_parent(text_layer_get_layer(s_day_in_month_layer));
+    layer_remove_from_parent(text_layer_get_layer(s_weekday_layer));
+    layer_remove_from_parent(text_layer_get_layer(s_month_layer));
+    if(config_get(PERSIST_KEY_DATE)) {
+        layer_add_child(window_layer, text_layer_get_layer(s_day_in_month_layer));
+    }
+    if(config_get(PERSIST_KEY_DAY)) {
+        layer_add_child(window_layer, text_layer_get_layer(s_weekday_layer));
+        layer_add_child(window_layer, text_layer_get_layer(s_month_layer));
+    }
+    layer_add_child(window_layer, s_canvas_layer);
 }

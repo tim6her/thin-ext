@@ -5,7 +5,10 @@ static bool s_arr[NUM_SETTINGS];
 
 void config_init() {
   // Set defaults
-  if(!persist_exists(PERSIST_DEFAULTS_SET)) {
+  if(
+     persist_exists(PERSIST_DEFAULTS_SET)
+    // true
+    ) {
     persist_write_bool(PERSIST_DEFAULTS_SET, true);
 
     persist_write_bool(PERSIST_KEY_DATE, true);
@@ -17,6 +20,7 @@ void config_init() {
     persist_write_bool(PERSIST_KEY_SECOND_NIGHT, true);
     persist_write_bool(PERSIST_KEY_LIGHT_THEME, false);
     persist_write_bool(PERSIST_KEY_NO_MARKERS, false);
+    persist_write_bool(PERSIST_KEY_MINUTE_MARKERS, true);
   }
 
   for(int i = 0; i < NUM_SETTINGS; i++) {

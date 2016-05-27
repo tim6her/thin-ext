@@ -1,4 +1,4 @@
-var VERSION = "1.1";
+var VERSION = "1.2";
 
 Pebble.addEventListener('ready', function(e) {
   console.log('PebbleKit JS ready! Version: ' + VERSION);
@@ -6,7 +6,7 @@ Pebble.addEventListener('ready', function(e) {
 
 Pebble.addEventListener('showConfiguration', function(e) {
   //Pebble.openURL('https://rawgit.com/silasg/thin-ext/master/config/thin-ext-config.html?version=' + VERSION);
-  Pebble.openURL('https://cdn.rawgit.com/silasg/thin-ext/v1.1/config/thin-ext-config.html?version=' + VERSION);
+  Pebble.openURL('https://cdn.rawgit.com/silasg/thin-ext/v1.2/config/thin-ext-config.html?version=' + VERSION);
 });
 
 Pebble.addEventListener('webviewclosed', function(e) {
@@ -21,7 +21,8 @@ Pebble.addEventListener('webviewclosed', function(e) {
     "PERSIST_KEY_SECOND_BATTERY": '' + json.second_battery,
     "PERSIST_KEY_SECOND_NIGHT": '' + json.second_night,
     "PERSIST_KEY_NO_MARKERS": '' + json.no_markers,
-    "PERSIST_KEY_LIGHT_THEME": '' + json.light_theme
+    "PERSIST_KEY_LIGHT_THEME": '' + json.light_theme,
+    "PERSIST_KEY_MINUTE_MARKERS": '' + json.minute_markers
   };
 
   Pebble.sendAppMessage(options, function(e) {
