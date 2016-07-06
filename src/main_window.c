@@ -121,6 +121,7 @@ void draw_markers(Layer *layer, GContext *ctx) {
         bool isHourMarker = ( m % 5 ) == 0;
         
         if (!isHourMarker && ( m < mmin || m > mmax )) continue;
+        if (!isHourMarker && s_animating) continue;
         
         int thickness = isHourMarker ? THICKNESS : 1;
         
