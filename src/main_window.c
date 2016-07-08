@@ -6,8 +6,8 @@ static Layer *s_canvas_layer, *s_bg_layer;
 
 static Time s_last_time, s_anim_time;
 static char s_weekday_buffer[8], s_month_buffer[8], s_day_in_month_buffer[3];
-static bool s_animating, s_connected, s_draw_second_hand;
-
+static bool s_animating, s_connected, s_draw_second_hand, s_tapped;
+static int s_draw_second_hand_tap_duration;
 static GColor colorForeGround, colorBackGround;
 
 #ifdef PBL_COLOR
@@ -21,18 +21,25 @@ void set_last_time(struct tm *tick_time) {
     s_last_time.seconds = tick_time->tm_sec;
 }
 
-
 static bool get_draw_second_hand()
 {
     BatteryChargeState state = battery_state_service_peek();
-    return config_get(PERSIST_KEY_SECOND_HAND)
+    return (config_get(PERSIST_KEY_SECOND_HAND)
     && (!config_get(PERSIST_KEY_SECOND_BATTERY) || state.is_plugged || state.charge_percent >= 20.0F )
-    && (!config_get(PERSIST_KEY_SECOND_NIGHT) ||  (s_last_time.hours > 6 && s_last_time.hours < 23));
+    && (!config_get(PERSIST_KEY_SECOND_NIGHT) || (s_last_time.hours > 6 && s_last_time.hours < 23)))
+    || (!config_get(PERSIST_KEY_SECOND_TAP) || s_draw_second_hand_tap_duration);
 }
 
 // fuck missing forward declaration in C :x
 static void resubscribe_tick_handler_if_needed();
 void main_window_reload_config();
+
+static void accel_tap_handler(AccelAxisType axis, int32_t direction) {
+  // A tap event occured
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "tap detected");
+  s_draw_second_hand_tap_duration = HAND_SECONDS_TAP_DURATION;
+  resubscribe_tick_handler_if_needed();
+}
 
 static void tick_handler(struct tm *tick_time, TimeUnits changed) {
     
@@ -40,6 +47,10 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
     
     resubscribe_tick_handler_if_needed();
     
+    if (s_draw_second_hand_tap_duration) {
+        s_draw_second_hand_tap_duration--;
+    }
+            
     snprintf(s_day_in_month_buffer, sizeof(s_day_in_month_buffer), "%d", s_last_time.days);
     strftime(s_weekday_buffer, sizeof(s_weekday_buffer), "%a", tick_time);
     strftime(s_month_buffer, sizeof(s_month_buffer), "%b", tick_time);
@@ -463,9 +474,13 @@ void main_window_push() {
         .unload = window_unload,
     });
     window_stack_push(s_main_window, true);
-    
+ 
     battery_state_service_subscribe(batt_handler);
     
+    if (config_get(PERSIST_KEY_SECOND_TAP)) {
+        accel_tap_service_subscribe(accel_tap_handler);
+    }
+        
     if(config_get(PERSIST_KEY_BT)) {
         bluetooth_connection_service_subscribe(bt_handler);
         bt_handler(bluetooth_connection_service_peek());
@@ -507,6 +522,11 @@ void main_window_reload_config() {
     battery_state_service_unsubscribe();
     if(config_get(PERSIST_KEY_BATTERY)) {
         battery_state_service_subscribe(batt_handler);
+    }
+  
+    accel_tap_service_unsubscribe();
+    if (config_get(PERSIST_KEY_SECOND_TAP)) {
+        accel_tap_service_subscribe(accel_tap_handler);
     }
     
     Layer *window_layer = window_get_root_layer(s_main_window);

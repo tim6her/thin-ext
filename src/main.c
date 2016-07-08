@@ -9,6 +9,5 @@ int main() {
   config_init();
 
   main_window_push();
-  
   app_event_loop();
 }
