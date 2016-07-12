@@ -6,8 +6,8 @@ static bool s_arr[NUM_SETTINGS];
 void config_init() {
   // Set defaults
   if(
-     persist_exists(PERSIST_DEFAULTS_SET)
-    // true
+    !persist_exists(PERSIST_DEFAULTS_SET)
+    //true
     ) {
     persist_write_bool(PERSIST_DEFAULTS_SET, true);
 

@@ -7,7 +7,7 @@ static Layer *s_canvas_layer, *s_bg_layer;
 static Time s_last_time, s_anim_time;
 static char s_weekday_buffer[8], s_month_buffer[8], s_day_in_month_buffer[3];
 static bool s_animating, s_connected, s_draw_second_hand, s_tapped;
-static int s_draw_second_hand_tap_duration;
+static int s_draw_second_hand_tap_duration = 0;
 static GColor colorForeGround, colorBackGround;
 
 #ifdef PBL_COLOR
@@ -27,7 +27,7 @@ static bool get_draw_second_hand()
     return (config_get(PERSIST_KEY_SECOND_HAND)
     && (!config_get(PERSIST_KEY_SECOND_BATTERY) || state.is_plugged || state.charge_percent >= 20.0F )
     && (!config_get(PERSIST_KEY_SECOND_NIGHT) || (s_last_time.hours > 6 && s_last_time.hours < 23)))
-    || (!config_get(PERSIST_KEY_SECOND_TAP) || s_draw_second_hand_tap_duration);
+    || (config_get(PERSIST_KEY_SECOND_TAP) && s_draw_second_hand_tap_duration > 0);
 }
 
 // fuck missing forward declaration in C :x
