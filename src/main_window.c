@@ -11,7 +11,7 @@ static int s_draw_second_hand_tap_duration = 0;
 static GColor colorForeGround, colorBackGround;
 
 #ifdef PBL_COLOR
-static GColor8 colorLight, colorHeavy, colorGreen, colorSecondHand, colorAccent;
+static GColor8 colorLight, colorHeavy, colorGreen, colorSecondHand, colorSecondHandFaded, colorAccent, colorAccentFaded;
 #endif
 
 void set_last_time(struct tm *tick_time) {
@@ -259,15 +259,27 @@ void draw_second_hand(GPoint center, Time mode_time, GContext *ctx) {
     len_sec -= (MARGIN + HAND_TIP_SIZE_DELTA);
     GPoint second_hand_short = make_hand_point(mode_time.seconds, 60, len_sec, center);
     
+    GColor handColor = PBL_IF_COLOR_ELSE(colorSecondHand, colorForeGround);
+    if (s_draw_second_hand_tap_duration < 1) {
+        handColor = PBL_IF_COLOR_ELSE(colorSecondHandFaded, colorForeGround);
+    }
+
+#ifdef PBL_COLOR
+    GColor tipColor = PBL_IF_COLOR_ELSE(colorAccentFaded, colorForeGround);
+    if (s_draw_second_hand_tap_duration < 1) {
+        tipColor = PBL_IF_COLOR_ELSE(colorAccentFaded, colorForeGround);
+    }
+#endif
+  
     // Use loops
     for(int y = 0; y < THICKNESS - 1; y++) {
         for(int x = 0; x < THICKNESS - 1; x++) {
-            graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(colorSecondHand, colorForeGround));
+            graphics_context_set_stroke_color(ctx, handColor);
             graphics_draw_line(ctx, GPoint(center.x + x, center.y + y), GPoint(second_hand_short.x + x, second_hand_short.y + y));
             
 #ifdef PBL_COLOR
             // Draw second hand tip
-            graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(colorAccent, colorForeGround));
+            graphics_context_set_stroke_color(ctx, tipColor);
             graphics_draw_line(ctx, GPoint(second_hand_short.x + x, second_hand_short.y + y), GPoint(second_hand_long.x + x, second_hand_long.y + y));
 #endif
         }
@@ -446,7 +458,9 @@ void set_colors(void) {
         colorHeavy = GColorDarkGray;
         colorGreen = GColorIslamicGreen;
         colorSecondHand = GColorFolly;
+        colorSecondHandFaded = GColorMelon;
         colorAccent = GColorRed;
+        colorAccentFaded = GColorSunsetOrange;
 #endif
     }
     else {
@@ -457,7 +471,9 @@ void set_colors(void) {
         colorHeavy = GColorLightGray;
         colorGreen = GColorGreen;
         colorSecondHand = GColorDarkCandyAppleRed;
+        colorSecondHandFaded = GColorBulgarianRose;
         colorAccent = GColorChromeYellow;
+        colorAccentFaded = GColorWindsorTan;
 #endif
     }
 }
@@ -479,6 +495,7 @@ void main_window_push() {
     
     if (config_get(PERSIST_KEY_SECOND_TAP)) {
         accel_tap_service_subscribe(accel_tap_handler);
+        s_draw_second_hand_tap_duration = HAND_SECONDS_TAP_DURATION;
     }
         
     if(config_get(PERSIST_KEY_BT)) {
