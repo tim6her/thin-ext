@@ -265,7 +265,7 @@ void draw_second_hand(GPoint center, Time mode_time, GContext *ctx) {
     }
 
 #ifdef PBL_COLOR
-    GColor tipColor = PBL_IF_COLOR_ELSE(colorAccentFaded, colorForeGround);
+    GColor tipColor = PBL_IF_COLOR_ELSE(colorAccent, colorForeGround);
     if (s_draw_second_hand_tap_duration < 1) {
         tipColor = PBL_IF_COLOR_ELSE(colorAccentFaded, colorForeGround);
     }
