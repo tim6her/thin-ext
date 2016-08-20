@@ -1,40 +1,42 @@
 {
-    "author": "Silas Graffy, Chris Lewis",
-    "dependencies": {},
-    "keywords": [],
-    "name": "thin-ext",
-    "pebble": {
-        "capabilities": [
-            "configurable"
-        ],
-        "displayName": "Thin Extended",
-        "enableMultiJS": false,
-        "messageKeys": {
-            "PERSIST_KEY_BATTERY": 3,
-            "PERSIST_KEY_BT": 2,
-            "PERSIST_KEY_DATE": 0,
-            "PERSIST_KEY_DAY": 1,
-            "PERSIST_KEY_LIGHT_THEME": 6,
-            "PERSIST_KEY_MINUTE_MARKERS": 9,
-            "PERSIST_KEY_NO_MARKERS": 5,
-            "PERSIST_KEY_SECOND_BATTERY": 7,
-            "PERSIST_KEY_SECOND_HAND": 4,
-            "PERSIST_KEY_SECOND_NIGHT": 8
-        },
-        "projectType": "native",
-        "resources": {
-            "media": []
-        },
-        "sdkVersion": "3",
-        "targetPlatforms": [
-            "aplite",
-            "basalt",
-            "chalk"
-        ],
-        "uuid": "bd7500d7-5524-4729-9d20-4acca5c7748d",
-        "watchapp": {
-            "watchface": true
-        }
+  "author": "Silas Graffy, Chris Lewis",
+  "dependencies": {
+    "pebble-clay": "^1.0.2"
+  },
+  "keywords": [],
+  "name": "thin-ext",
+  "pebble": {
+    "capabilities": [
+      "configurable"
+    ],
+    "displayName": "Thin Extended",
+    "enableMultiJS": true,
+    "messageKeys": {
+      "PERSIST_KEY_BATTERY": 3,
+      "PERSIST_KEY_BT": 2,
+      "PERSIST_KEY_DATE": 0,
+      "PERSIST_KEY_DAY": 1,
+      "PERSIST_KEY_LIGHT_THEME": 6,
+      "PERSIST_KEY_MINUTE_MARKERS": 9,
+      "PERSIST_KEY_NO_MARKERS": 5,
+      "PERSIST_KEY_SECOND_BATTERY": 7,
+      "PERSIST_KEY_SECOND_HAND": 4,
+      "PERSIST_KEY_SECOND_NIGHT": 8
     },
-    "version": "1.2.0"
+    "projectType": "native",
+    "resources": {
+      "media": []
+    },
+    "sdkVersion": "3",
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk"
+    ],
+    "uuid": "bd7500d7-5524-4729-9d20-4acca5c7748d",
+    "watchapp": {
+      "watchface": true
+    }
+  },
+  "version": "1.3.0"
 }

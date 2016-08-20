@@ -1,9 +1,15 @@
 #include "comm.h"
 
 static void in_recv_handler(DictionaryIterator *iter, void *context) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "recv handler start");
+    
   Tuple *t = dict_read_first(iter);
   while(t) {
-    persist_write_bool(t->key, strcmp(t->value->cstring, "true") == 0 ? true : false);
+    
+      if (!strcmp(t->value->cstring, "")) // TODO: this is hacky, also change config names
+          persist_write_bool(t->key, strcmp(t->value->cstring, "true") == 0 ? true : false);
+      else
+          persist_write_bool(t-> key, t->value->int32);
     t = dict_read_next(iter);
   }
 

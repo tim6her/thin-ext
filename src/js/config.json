@@ -1,10 +1,54 @@
 [
-  { 
-    "type": "heading", 
-    "defaultValue": "Example Header Item" 
-  }, 
-  { 
-    "type": "text", 
-    "defaultValue": "Example text item." 
-  }
+  {
+      "type": "section",
+      "items": [
+        {
+          "type": "heading",
+          "defaultValue": "Theme"
+        },
+        {
+          "type": "radiogroup",
+          "messageKey": "PERSIST_KEY_LIGHT_THEME",
+            "defaultValue" : "false",
+          "options": [
+            { 
+              "label": "Original (dark)", 
+              "value": "false" 
+            },
+            { 
+              "label": "Light", 
+              "value": "true" 
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "items": [
+        {
+          "type": "heading",
+          "defaultValue": "Date"
+        },
+          {
+              "type": "toggle",
+              "messageKey": "PERSIST_KEY_DATE",
+              "label": "Show date (day of month)",
+              "defaultValue" : true
+            },
+            {
+              "type": "toggle",
+              "messageKey": "PERSIST_KEY_DAY",
+              "label": "Show weekday and month",
+              "defaultValue" : true
+            }
+      ]
+    },
+    
+    
+    {
+      "type": "submit",
+      "defaultValue": "Save"
+    }
+    
 ]
