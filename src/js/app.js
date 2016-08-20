@@ -1,9 +1,14 @@
-var VERSION = "1.2";
+//var VERSION = "1.3";
 
+var Clay = require('pebble-clay');
+var clayConfig = require('./config.json');
+var clay = new Clay(clayConfig);
+/*
 Pebble.addEventListener('ready', function(e) {
   console.log('PebbleKit JS ready! Version: ' + VERSION);
 });
 
+/*
 Pebble.addEventListener('showConfiguration', function(e) {
   //Pebble.openURL('https://rawgit.com/silasg/thin-ext/master/config/thin-ext-config.html?version=' + VERSION);
   Pebble.openURL('https://cdn.rawgit.com/silasg/thin-ext/v1.2/config/thin-ext-config.html?version=' + VERSION);
@@ -32,3 +37,4 @@ Pebble.addEventListener('webviewclosed', function(e) {
     console.log('Settings update failed: ' + JSON.stringify(e));
   });
 }); 
+*/
