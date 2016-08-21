@@ -6,7 +6,7 @@ static Layer *s_canvas_layer, *s_bg_layer;
 
 static Time s_last_time, s_anim_time;
 static char s_weekday_buffer[8], s_month_buffer[8], s_day_in_month_buffer[3];
-static bool s_animating, s_connected, s_draw_second_hand, s_tapped;
+static bool s_animating, s_connected, s_draw_second_hand;
 static int s_draw_second_hand_tap_duration = 0;
 static GColor colorForeGround, colorBackGround;
 
@@ -25,10 +25,20 @@ static bool get_draw_second_hand()
 {
     BatteryChargeState state = battery_state_service_peek();
     return (config_get(PERSIST_KEY_SECOND_HAND)
-    && (!config_get(PERSIST_KEY_SECOND_BATTERY) || state.is_plugged || state.charge_percent >= 20.0F )
-    && (!config_get(PERSIST_KEY_SECOND_NIGHT) || (s_last_time.hours > 6 && s_last_time.hours < 23)))
-    || (config_get(PERSIST_KEY_SECOND_TAP) && s_draw_second_hand_tap_duration > 0);
+            && (!config_get(PERSIST_KEY_SECOND_BATTERY) || state.is_plugged || state.charge_percent >= 20.0F )
+            && (!config_get(PERSIST_KEY_SECOND_NIGHT) || (s_last_time.hours > 6 && s_last_time.hours < 23)));
 }
+
+static bool get_draw_second_hand_temporary()
+{
+    return config_get(PERSIST_KEY_SECOND_TAP) && s_draw_second_hand_tap_duration > 0;
+}
+
+static bool get_draw_second_hand_resolved()
+{
+    return get_draw_second_hand() || get_draw_second_hand_temporary();
+}
+
 
 // fuck missing forward declaration in C :x
 static void resubscribe_tick_handler_if_needed();
@@ -36,7 +46,7 @@ void main_window_reload_config();
 
 static void accel_tap_handler(AccelAxisType axis, int32_t direction) {
   // A tap event occured
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "tap detected");
+  // APP_LOG(APP_LOG_LEVEL_DEBUG, "tap detected");
   s_draw_second_hand_tap_duration = HAND_SECONDS_TAP_DURATION;
   resubscribe_tick_handler_if_needed();
 }
@@ -74,7 +84,7 @@ static void subscribe_tick_handler() {
 }
 
 static void resubscribe_tick_handler_if_needed() {
-    bool new_draw_second_hand = get_draw_second_hand();
+    bool new_draw_second_hand = get_draw_second_hand_resolved();
     if (new_draw_second_hand != s_draw_second_hand)
     {
         s_draw_second_hand = new_draw_second_hand;
@@ -245,6 +255,10 @@ static int get_marker_extension(Time time, int forHand) {
     }
 }
 
+static bool is_last_faded_second_hand_display() {
+    return !get_draw_second_hand() && config_get(PERSIST_KEY_SECOND_TAP) && s_draw_second_hand_tap_duration == 0;
+}
+
 void draw_second_hand(GPoint center, Time mode_time, GContext *ctx) {
     
     int len_sec = HAND_LENGTH_SEC;
@@ -260,15 +274,13 @@ void draw_second_hand(GPoint center, Time mode_time, GContext *ctx) {
     GPoint second_hand_short = make_hand_point(mode_time.seconds, 60, len_sec, center);
     
     GColor handColor = PBL_IF_COLOR_ELSE(colorSecondHand, colorForeGround);
-    if (s_draw_second_hand_tap_duration < 1) {
+    if (is_last_faded_second_hand_display())
         handColor = PBL_IF_COLOR_ELSE(colorSecondHandFaded, colorForeGround);
-    }
 
 #ifdef PBL_COLOR
     GColor tipColor = PBL_IF_COLOR_ELSE(colorAccent, colorForeGround);
-    if (s_draw_second_hand_tap_duration < 1) {
+    if (is_last_faded_second_hand_display())
         tipColor = PBL_IF_COLOR_ELSE(colorAccentFaded, colorForeGround);
-    }
 #endif
   
     // Use loops
@@ -522,7 +534,7 @@ void main_window_reload_config() {
     
     tick_timer_service_unsubscribe();
     
-    if(get_draw_second_hand()) {
+    if(get_draw_second_hand_resolved()) {
         tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
     } else {
         tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);

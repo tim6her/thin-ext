@@ -10,9 +10,10 @@
           "type": "radiogroup",
           "messageKey": "PERSIST_KEY_LIGHT_THEME",
             "defaultValue" : "false",
+            "description": "Choose between the dark theme of the original 'Thin' watchface or it's lighter alternative.",
           "options": [
             { 
-              "label": "Original (dark)", 
+              "label": "Original", 
               "value": "false" 
             },
             { 
@@ -40,6 +41,88 @@
               "type": "toggle",
               "messageKey": "PERSIST_KEY_DAY",
               "label": "Show weekday and month",
+              "defaultValue" : true
+            }
+      ]
+    },
+    {
+      "type": "section",
+      "items": [
+        {
+          "type": "heading",
+          "defaultValue": "Second Hand"
+        },
+          {
+              "type": "toggle",
+              "messageKey": "PERSIST_KEY_SECOND_HAND",
+              "label": "Show second hand",
+              "defaultValue" : true
+            },
+            {
+              "type": "toggle",
+              "messageKey": "PERSIST_KEY_SECOND_BATTERY",
+              "label": "Hide second hand if battery low",
+              "description": "Second hand will be hidden when 20% or less battery remaining.",
+              "defaultValue" : true
+            },
+            {
+              "type": "toggle",
+              "messageKey": "PERSIST_KEY_SECOND_NIGHT",
+              "label": "Hide second hand at night",
+              "description": "Second hand will be hidden from 23 (11pm) to 7 (7am).",
+              "defaultValue" : true
+            },
+            {
+              "type": "toggle",
+              "messageKey": "PERSIST_KEY_SECOND_TAP",
+              "label": "Shake to show second hand",
+              "description": "If hidden, second hand will be shown for 10 seconds when tapping or shaking the watch or coming back from menu or timeline.",
+              "defaultValue" : true
+            }
+      ]
+    },
+    {
+      "type": "section",
+      "items": [
+        {
+          "type": "heading",
+          "defaultValue": "Markers"
+        },
+            {
+              "type": "toggle",
+              "messageKey": "PERSIST_KEY_MINUTE_MARKERS",
+              "label": "Show additional minute markers",
+              "description": "A light marker for each minute will be shown at at the minute hand's current posstion.",
+              "defaultValue" : true
+            },
+            {
+              "type": "toggle",
+              "messageKey": "PERSIST_KEY_NO_MARKERS",
+              "label": "Hide markers",
+              "description": "All markers will be hidden and longer hands will be used to fill up the empty space (looks best on round screens).",
+              "defaultValue" : false
+            }
+      ]
+    },
+    {
+      "type": "section",
+      "items": [
+        {
+          "type": "heading",
+          "defaultValue": "System"
+        },
+            {
+              "type": "toggle",
+              "messageKey": "PERSIST_KEY_BT",
+              "label": "Show disconnected indicator",
+              "description": "The dot at the watchface's center will be empty when disconnected, full otherwise.",
+              "defaultValue" : true
+            },
+            {
+              "type": "toggle",
+              "messageKey": "PERSIST_KEY_BATTERY",
+              "label": "Show battery level",
+              "description": "The emptier the battery is, the more markers will be faded (or hidden on monochrome screens).",
               "defaultValue" : true
             }
       ]
