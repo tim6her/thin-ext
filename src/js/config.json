@@ -9,16 +9,16 @@
         {
           "type": "radiogroup",
           "messageKey": "PERSIST_KEY_LIGHT_THEME",
-            "defaultValue" : "false",
+            "defaultValue" : "dark",
             "description": "Choose between the dark theme of the original 'Thin' watchface or it's lighter alternative.",
           "options": [
             { 
-              "label": "Original", 
-              "value": "false" 
+              "label": "Dark (original)", 
+              "value": "dark" 
             },
             { 
-              "label": "Light", 
-              "value": "true" 
+              "label": "Light (extended)", 
+              "value": "light" 
             }
           ]
         }
@@ -31,18 +31,26 @@
           "type": "heading",
           "defaultValue": "Date"
         },
+          
           {
-              "type": "toggle",
-              "messageKey": "PERSIST_KEY_DATE",
-              "label": "Show date (day of month)",
-              "defaultValue" : true
+          "type": "radiogroup",
+          "messageKey": "PERSIST_KEY_DATE_STYLE",
+            "defaultValue" : "dark",
+          "options": [
+            { 
+              "label": "Don't show any date", 
+              "value": "none" 
             },
-            {
-              "type": "toggle",
-              "messageKey": "PERSIST_KEY_DAY",
-              "label": "Show weekday and month",
-              "defaultValue" : true
+            { 
+              "label": "Show day of month only", 
+              "value": "date" 
+            },
+            { 
+              "label": "Show weekday, day of month and month", 
+              "value": "all" 
             }
+          ]
+        }
       ]
     },
     {
