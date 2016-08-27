@@ -18,10 +18,10 @@ Use the config page to adjust which features you want from:
 - Show seconds hand
 - Hide seconds hand, if battery low
 - Hide seconds hand at night
+- Temporary show seconds hand on tap, if hidden
 - Show battery charging state
 - Show additional minute markers where needed
 - Hide all markers and show langer hands instead
 
-![](screenshots/config.png)
 
 
