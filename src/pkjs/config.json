@@ -11,6 +11,28 @@
           "messageKey": "PERSIST_KEY_LIGHT_THEME",
             "defaultValue" : "dark",
             "description": "Choose between the dark theme of the original 'Thin' watchface or it's lighter alternative.",
+            "capabilities": ["NOT_BW"],
+          "options": [
+            { 
+              "label": "Dark (original)", 
+              "value": "dark" 
+            },
+            { 
+              "label": "Light", 
+              "value": "light" 
+            },
+            { 
+              "label": "Custom", 
+              "value": "custom"
+            }
+          ]
+        },
+        {
+          "type": "radiogroup",
+          "messageKey": "PERSIST_KEY_LIGHT_THEME",
+            "defaultValue" : "dark",
+            "description": "Choose between the dark theme of the original 'Thin' watchface or it's lighter alternative.",
+            "capabilities": ["BW"],
           "options": [
             { 
               "label": "Dark (original)", 
